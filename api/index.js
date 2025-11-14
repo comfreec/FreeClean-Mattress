@@ -1,7 +1,13 @@
 import admin from 'firebase-admin';
 
-// Firebase Admin 초기화
-if (!admin.apps.length) {
+let db = null;
+
+// Firebase 초기화 함수
+function initializeFirebase() {
+  if (admin.apps.length > 0) {
+    return admin.firestore();
+  }
+
   try {
     const privateKey = process.env.FIREBASE_PRIVATE_KEY;
     if (!privateKey) {
@@ -16,16 +22,28 @@ if (!admin.apps.length) {
       })
     });
     console.log('Firebase initialized successfully');
+    return admin.firestore();
   } catch (error) {
     console.error('Firebase 초기화 에러:', error);
     throw error;
   }
 }
 
-const db = admin.firestore();
-
 // Vercel Serverless Function Handler
 export default async function handler(req, res) {
+  // Firebase 초기화 (첫 요청시에만)
+  try {
+    if (!db) {
+      db = initializeFirebase();
+    }
+  } catch (error) {
+    console.error('Firebase initialization failed:', error);
+    return res.status(500).json({
+      success: false,
+      message: 'Database initialization failed',
+      error: error.message
+    });
+  }
   // CORS 헤더 설정
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PATCH, DELETE, OPTIONS');
