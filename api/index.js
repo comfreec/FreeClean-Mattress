@@ -22,7 +22,7 @@ app.use(express.json());
 // ============ API 엔드포인트 ============
 
 // 1. 무료 케어 신청
-app.post('/api/applications', async (req, res) => {
+app.post('/applications', async (req, res) => {
   try {
     const {
       name,
@@ -67,7 +67,7 @@ app.post('/api/applications', async (req, res) => {
 });
 
 // 2. 신청 목록 조회 (관리자)
-app.get('/api/applications', async (req, res) => {
+app.get('/applications', async (req, res) => {
   try {
     const { status } = req.query;
 
@@ -102,7 +102,7 @@ app.get('/api/applications', async (req, res) => {
 });
 
 // 3. 신청 상태 업데이트
-app.patch('/api/applications/:id', async (req, res) => {
+app.patch('/applications/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const { status } = req.body;
@@ -129,7 +129,7 @@ app.patch('/api/applications/:id', async (req, res) => {
 });
 
 // 3-1. 신청 삭제
-app.delete('/api/applications/:id', async (req, res) => {
+app.delete('/applications/:id', async (req, res) => {
   try {
     const { id } = req.params;
 
@@ -149,7 +149,7 @@ app.delete('/api/applications/:id', async (req, res) => {
 });
 
 // 4. 제품 목록 조회
-app.get('/api/products', async (req, res) => {
+app.get('/products', async (req, res) => {
   try {
     const snapshot = await db.collection('products').orderBy('id').get();
     const products = [];
@@ -177,7 +177,7 @@ app.get('/api/products', async (req, res) => {
 });
 
 // 5. 리뷰 목록 조회
-app.get('/api/reviews', async (req, res) => {
+app.get('/reviews', async (req, res) => {
   try {
     const snapshot = await db.collection('reviews').orderBy('created_at', 'desc').get();
     const reviews = [];
@@ -204,7 +204,7 @@ app.get('/api/reviews', async (req, res) => {
 });
 
 // 5-1. 리뷰 작성
-app.post('/api/reviews', async (req, res) => {
+app.post('/reviews', async (req, res) => {
   try {
     const { name, rating, content } = req.body;
 
@@ -232,7 +232,7 @@ app.post('/api/reviews', async (req, res) => {
 });
 
 // 6. 통계 조회 (관리자)
-app.get('/api/stats', async (req, res) => {
+app.get('/stats', async (req, res) => {
   try {
     console.log('[API] /api/stats 요청 받음');
 
@@ -271,7 +271,7 @@ app.get('/api/stats', async (req, res) => {
 // ============ 게시판 API ============
 
 // 7. 게시글 목록 조회
-app.get('/api/posts', async (req, res) => {
+app.get('/posts', async (req, res) => {
   try {
     const postsSnapshot = await db.collection('posts').orderBy('created_at', 'desc').get();
     const posts = [];
@@ -304,7 +304,7 @@ app.get('/api/posts', async (req, res) => {
 });
 
 // 8. 게시글 상세 조회
-app.get('/api/posts/:id', async (req, res) => {
+app.get('/posts/:id', async (req, res) => {
   try {
     const { id } = req.params;
     const docRef = db.collection('posts').doc(id);
@@ -342,7 +342,7 @@ app.get('/api/posts/:id', async (req, res) => {
 });
 
 // 9. 게시글 작성
-app.post('/api/posts', async (req, res) => {
+app.post('/posts', async (req, res) => {
   try {
     const { title, content, author, password } = req.body;
 
@@ -372,7 +372,7 @@ app.post('/api/posts', async (req, res) => {
 });
 
 // 10. 댓글 목록 조회
-app.get('/api/posts/:id/comments', async (req, res) => {
+app.get('/posts/:id/comments', async (req, res) => {
   try {
     const { id } = req.params;
     const snapshot = await db.collection('comments')
@@ -403,7 +403,7 @@ app.get('/api/posts/:id/comments', async (req, res) => {
 });
 
 // 11. 댓글 작성
-app.post('/api/posts/:id/comments', async (req, res) => {
+app.post('/posts/:id/comments', async (req, res) => {
   try {
     const { id } = req.params;
     const { author, content } = req.body;
