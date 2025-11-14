@@ -1,0 +1,15 @@
+{
+  "name": "coway-mattress-app",
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "cd server && npm run dev",
+    "build": "cd client && npm run build",
+    "init-firestore": "node functions/init-firestore.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^13.0.1",
+    "express": "^5.1.0",
+    "cors": "^2.8.5"
+  }
+}

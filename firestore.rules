@@ -1,0 +1,37 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // 애플리케이션 신청 - 누구나 읽기/쓰기 가능
+    match /applications/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 제품 - 누구나 읽기 가능
+    match /products/{document=**} {
+      allow read: if true;
+      allow write: if false; // 관리자만 수정 가능하도록 나중에 변경 가능
+    }
+
+    // 리뷰 - 누구나 읽기/쓰기 가능
+    match /reviews/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 게시글 - 누구나 읽기/쓰기 가능
+    match /posts/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 댓글 - 누구나 읽기/쓰기 가능
+    match /comments/{document=**} {
+      allow read, write: if true;
+    }
+
+    // 관리자 사용자 - 읽기만 허용
+    match /admin_users/{document=**} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}
