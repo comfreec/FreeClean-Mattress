@@ -38,35 +38,44 @@ function HomePage() {
         </div>
 
         <div className="container mx-auto px-4 text-center relative z-10">
-          <div className="inline-block mb-3 md:mb-4 px-3 md:px-4 py-1.5 md:py-2 bg-white/20 backdrop-blur-sm rounded-full text-xs md:text-sm font-semibold">
-            ✨ 건강한 수면의 시작
+          {/* 긴급성 배지 */}
+          <div className="mb-4 md:mb-6 animate-bounce">
+            <div className="inline-block bg-gradient-to-r from-red-500 to-orange-500 text-white px-4 md:px-6 py-2 md:py-3 rounded-full text-sm md:text-base font-bold shadow-2xl">
+              🔥 이번 달 한정! 선착순 무료 케어 진행중
+            </div>
           </div>
 
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-4 md:mb-6 leading-tight px-2">
-            지금 무료로<br />
-            <span className="text-yellow-300">매트리스 케어</span> 받으세요
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight px-2">
+            <span className="text-yellow-300 text-4xl sm:text-5xl md:text-6xl lg:text-7xl">15만원 상당</span><br />
+            매트리스 케어를<br />
+            <span className="bg-gradient-to-r from-yellow-300 to-green-300 bg-clip-text text-transparent">지금 100% 무료</span>로!
           </h1>
 
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-6 md:mb-8 text-blue-100 max-w-2xl mx-auto px-4">
-            전문가의 무료 진단부터 99.9% 진드기 제거까지
+          <p className="text-lg sm:text-xl md:text-2xl lg:text-3xl mb-4 md:mb-6 text-yellow-300 font-bold max-w-3xl mx-auto px-4 animate-pulse">
+            ⚠️ 당신의 매트리스에 진드기가 수백만 마리!
+          </p>
+
+          <p className="text-base sm:text-lg md:text-xl mb-6 md:mb-8 text-blue-100 max-w-2xl mx-auto px-4">
+            전문가의 무료 진단부터 99.9% 진드기 제거까지<br />
+            <span className="text-yellow-200 font-semibold">지금 신청하지 않으면 기회를 놓칩니다!</span>
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center mb-6 md:mb-8 px-4">
             <Link
               to="/application"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-coway-blue px-6 sm:px-8 md:px-10 py-3 md:py-4 rounded-full text-base md:text-lg font-bold hover:bg-yellow-300 hover:text-coway-navy transition-all transform hover:scale-105 shadow-xl whitespace-nowrap"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 text-gray-900 px-6 sm:px-8 md:px-12 py-4 md:py-5 rounded-full text-base md:text-xl font-black hover:scale-110 transition-all transform shadow-2xl whitespace-nowrap animate-pulse border-4 border-yellow-500"
             >
-              <span>무료 신청하기</span>
-              <svg className="ml-2 w-4 h-4 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              <span>👉 지금 바로 무료 신청 (15만원 혜택!)</span>
+              <svg className="ml-2 w-5 h-5 md:w-6 md:h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
 
             <Link
               to="/board"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3 md:py-4 rounded-full text-base md:text-lg font-semibold hover:bg-white hover:text-coway-blue transition-all whitespace-nowrap"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3 md:py-4 rounded-full text-sm md:text-base font-semibold hover:bg-white hover:text-coway-blue transition-all whitespace-nowrap"
             >
-              후기 보기
+              ⭐ 고객 후기 보기 (만족도 4.9/5)
             </Link>
           </div>
 
@@ -88,6 +97,135 @@ function HomePage() {
                 <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
               </svg>
               <span>리포트 제공</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 고객 후기 미리보기 Section */}
+      <section className="py-8 md:py-12 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-6 md:mb-8">
+            <h2 className="text-2xl md:text-3xl font-bold mb-2">💯 실제 고객님들의 생생한 후기</h2>
+            <p className="text-gray-600">이미 <span className="text-coway-blue font-bold">10,000명 이상</span>이 경험했습니다!</p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-6 max-w-6xl mx-auto">
+            {[
+              { name: "김민수", rating: 5, text: "매트리스 케어 받고 나서 천식 증상이 많이 좋아졌어요. 진드기가 정말 많이 나왔다고 하더라고요. 무료로 해주셔서 감사합니다!", badge: "천식 개선" },
+              { name: "이지은", rating: 5, text: "아이가 알레르기가 있어서 걱정했는데, 케어 후 훨씬 좋아졌어요. 전문가분이 친절하게 설명도 해주시고 매트리스 상태 리포트도 주셨어요.", badge: "알레르기 완화" },
+              { name: "박철수", rating: 5, text: "10년 된 매트리스라 걱정했는데, 케어 받고 나니 새것처럼 깨끗해졌어요. 코웨이 제품으로 교체도 고민중입니다.", badge: "새 것처럼" }
+            ].map((review, index) => (
+              <div key={index} className="bg-gradient-to-br from-blue-50 to-white p-5 md:p-6 rounded-2xl shadow-lg hover:shadow-xl transition-all border-2 border-blue-100">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 bg-coway-blue rounded-full flex items-center justify-center text-white font-bold">
+                      {review.name[0]}
+                    </div>
+                    <div>
+                      <div className="font-bold text-gray-900">{review.name}</div>
+                      <div className="text-yellow-500 text-sm">{'⭐'.repeat(review.rating)}</div>
+                    </div>
+                  </div>
+                  <div className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold">
+                    {review.badge}
+                  </div>
+                </div>
+                <p className="text-gray-700 text-sm leading-relaxed">{review.text}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-6 md:mt-8">
+            <Link to="/board" className="inline-flex items-center text-coway-blue font-bold hover:underline">
+              후기 더 보기 →
+            </Link>
+          </div>
+        </div>
+      </section>
+
+      {/* Before/After Section - 새로 추가 */}
+      <section className="py-12 md:py-16 bg-gradient-to-r from-gray-900 via-gray-800 to-gray-900 text-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-8 md:mb-12">
+            <h2 className="text-3xl md:text-4xl font-bold mb-3">
+              😱 충격! 케어 전 vs 후 비교
+            </h2>
+            <p className="text-gray-300 text-base md:text-lg">
+              당신의 매트리스도 이럴 수 있습니다
+            </p>
+          </div>
+
+          <div className="max-w-5xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
+              {/* Before */}
+              <div className="bg-red-900/30 border-4 border-red-500 rounded-2xl p-6 md:p-8">
+                <div className="bg-red-500 text-white text-center py-2 rounded-lg mb-4 font-bold text-lg">
+                  ❌ 케어 전
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 text-red-200">
+                    <span className="text-2xl">🦠</span>
+                    <div>
+                      <div className="font-bold">진드기 200만 마리 이상</div>
+                      <div className="text-sm text-gray-300">알레르기, 천식 유발</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 text-red-200">
+                    <span className="text-2xl">😷</span>
+                    <div>
+                      <div className="font-bold">곰팡이 포자 번식</div>
+                      <div className="text-sm text-gray-300">호흡기 질환 위험</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 text-red-200">
+                    <span className="text-2xl">🤢</span>
+                    <div>
+                      <div className="font-bold">악취 및 오염물질</div>
+                      <div className="text-sm text-gray-300">수면 방해, 건강 악화</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* After */}
+              <div className="bg-green-900/30 border-4 border-green-500 rounded-2xl p-6 md:p-8">
+                <div className="bg-green-500 text-white text-center py-2 rounded-lg mb-4 font-bold text-lg">
+                  ✅ 케어 후
+                </div>
+                <div className="space-y-3">
+                  <div className="flex items-start gap-3 text-green-200">
+                    <span className="text-2xl">✨</span>
+                    <div>
+                      <div className="font-bold">진드기 99.9% 제거</div>
+                      <div className="text-sm text-gray-300">전문 UV 살균 + 고온 스팀</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 text-green-200">
+                    <span className="text-2xl">🌿</span>
+                    <div>
+                      <div className="font-bold">완벽한 위생 상태</div>
+                      <div className="text-sm text-gray-300">새 매트리스처럼 깨끗</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3 text-green-200">
+                    <span className="text-2xl">😴</span>
+                    <div>
+                      <div className="font-bold">건강한 수면 환경</div>
+                      <div className="text-sm text-gray-300">가족 건강 지키기</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="mt-8 md:mt-12 text-center">
+              <Link
+                to="/application"
+                className="inline-flex items-center justify-center bg-gradient-to-r from-yellow-400 to-yellow-300 text-gray-900 px-8 md:px-12 py-4 md:py-5 rounded-full text-lg md:text-xl font-black hover:scale-110 transition-all transform shadow-2xl whitespace-nowrap border-4 border-yellow-500"
+              >
+                🎁 지금 무료로 깨끗하게 만들기 (15만원 상당)
+              </Link>
             </div>
           </div>
         </div>
@@ -289,45 +427,73 @@ function HomePage() {
         </div>
       </section>
 
-      {/* CTA Section - 개선된 디자인 */}
-      <section className="py-12 md:py-24 bg-gradient-to-r from-coway-blue via-blue-600 to-coway-navy text-white relative overflow-hidden">
-        <div className="absolute inset-0 opacity-20">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-300 rounded-full filter blur-3xl"></div>
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-green-300 rounded-full filter blur-3xl"></div>
+      {/* CTA Section - 긴급 마감 임박 디자인 */}
+      <section className="py-12 md:py-24 bg-gradient-to-br from-red-600 via-orange-600 to-red-700 text-white relative overflow-hidden">
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-0 left-1/4 w-96 h-96 bg-yellow-300 rounded-full filter blur-3xl animate-pulse"></div>
+          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-red-300 rounded-full filter blur-3xl animate-pulse"></div>
         </div>
 
         <div className="container mx-auto px-4 text-center relative z-10">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-4 md:mb-6 px-2">
-            지금 바로 무료 케어를 신청하세요
+          {/* 긴급 마감 배지 */}
+          <div className="mb-4 md:mb-6">
+            <div className="inline-block bg-yellow-400 text-red-900 px-4 md:px-6 py-2 md:py-3 rounded-full text-sm md:text-base font-black shadow-2xl animate-bounce">
+              ⚠️ 마감 임박! 이번 달 무료 케어 선착순 마감
+            </div>
+          </div>
+
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 md:mb-6 px-2 leading-tight">
+            지금 신청 안 하시면<br />
+            <span className="text-yellow-300 text-3xl sm:text-4xl md:text-5xl lg:text-6xl">15만원을 내야 합니다!</span>
           </h2>
-          <p className="text-base sm:text-lg md:text-xl lg:text-2xl mb-8 md:mb-10 text-blue-100 max-w-2xl mx-auto px-4">
-            건강한 수면 환경을 위한 첫 걸음을 시작하세요
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10 max-w-4xl mx-auto px-4">
+            <div className="bg-white/10 backdrop-blur-sm border-2 border-yellow-400 rounded-xl p-4 md:p-6">
+              <div className="text-3xl md:text-4xl font-black text-yellow-300 mb-2">10,000+</div>
+              <div className="text-sm md:text-base">만족한 고객님</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm border-2 border-yellow-400 rounded-xl p-4 md:p-6">
+              <div className="text-3xl md:text-4xl font-black text-yellow-300 mb-2">99.9%</div>
+              <div className="text-sm md:text-base">진드기 제거율</div>
+            </div>
+            <div className="bg-white/10 backdrop-blur-sm border-2 border-yellow-400 rounded-xl p-4 md:p-6">
+              <div className="text-3xl md:text-4xl font-black text-yellow-300 mb-2">100%</div>
+              <div className="text-sm md:text-base">완전 무료</div>
+            </div>
+          </div>
+
+          <p className="text-lg sm:text-xl md:text-2xl mb-6 md:mb-8 text-yellow-100 max-w-2xl mx-auto px-4 font-bold">
+            💰 정상가 15만원 ➜ <span className="text-yellow-300 text-2xl md:text-3xl">지금은 0원!</span>
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
             <Link
               to="/application"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-coway-blue px-8 md:px-12 py-4 md:py-5 rounded-full text-base md:text-xl font-bold hover:bg-yellow-300 hover:text-coway-navy transition-all transform hover:scale-105 shadow-2xl whitespace-nowrap"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 text-gray-900 px-8 md:px-12 py-5 md:py-6 rounded-full text-lg md:text-2xl font-black hover:scale-110 transition-all transform shadow-2xl whitespace-nowrap animate-pulse border-4 border-yellow-500"
             >
-              <svg className="w-5 h-5 md:w-6 md:h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              <svg className="w-6 h-6 md:w-7 md:h-7 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-              무료 신청하기
+              30초 만에 무료 신청 완료!
             </Link>
 
             <a
               href="tel:010-2417-7936"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-transparent border-2 border-white text-white px-8 md:px-12 py-4 md:py-5 rounded-full text-base md:text-xl font-bold hover:bg-white hover:text-coway-blue transition-all whitespace-nowrap"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-red-600 px-8 md:px-12 py-5 md:py-6 rounded-full text-base md:text-xl font-black hover:bg-yellow-300 hover:text-gray-900 transition-all shadow-2xl whitespace-nowrap"
             >
               <svg className="w-5 h-5 md:w-6 md:h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
-              전화 상담하기
+              긴급 전화 상담
             </a>
           </div>
 
-          <p className="mt-6 md:mt-8 text-sm md:text-base text-blue-200 px-4">
+          <p className="mt-6 md:mt-8 text-sm md:text-base text-yellow-200 px-4 font-bold">
             📞 010-2417-7936 | ⏰ 평일 09:00 - 18:00
+          </p>
+
+          <p className="mt-4 text-xs md:text-sm text-yellow-300 px-4 animate-pulse">
+            ⚠️ 주의: 선착순 마감 시 정상가 15만원으로 유료 전환됩니다
           </p>
         </div>
       </section>
