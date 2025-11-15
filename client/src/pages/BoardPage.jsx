@@ -58,9 +58,9 @@ function BoardPage() {
         <div className="flex justify-end mb-4 md:mb-6">
           <Link
             to="/board/write"
-            className="bg-gradient-to-r from-coway-blue to-blue-600 text-white px-6 md:px-8 py-2.5 md:py-3 rounded-xl font-bold hover:shadow-xl hover:scale-105 transition-all inline-flex items-center space-x-2 shadow-lg text-sm md:text-base"
+            className="bg-gradient-to-r from-coway-blue to-blue-600 text-white px-6 md:px-8 py-2.5 md:py-3 rounded-xl font-bold hover:shadow-xl hover:scale-105 transition-all inline-flex items-center space-x-2 shadow-lg text-sm md:text-base whitespace-nowrap"
           >
-            <svg className="w-4 h-4 md:w-5 md:h-5" fill="currentColor" viewBox="0 0 20 20">
+            <svg className="w-4 h-4 md:w-5 md:h-5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
               <path fillRule="evenodd" d="M10 3a1 1 0 011 1v5h5a1 1 0 110 2h-5v5a1 1 0 11-2 0v-5H4a1 1 0 110-2h5V4a1 1 0 011-1z" clipRule="evenodd"/>
             </svg>
             <span>글쓰기</span>

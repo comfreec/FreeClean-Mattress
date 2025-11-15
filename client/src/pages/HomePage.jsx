@@ -54,17 +54,17 @@ function HomePage() {
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center items-center mb-6 md:mb-8 px-4">
             <Link
               to="/application"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-coway-blue px-6 sm:px-8 md:px-10 py-3 md:py-4 rounded-full text-base md:text-lg font-bold hover:bg-yellow-300 hover:text-coway-navy transition-all transform hover:scale-105 shadow-xl"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-coway-blue px-6 sm:px-8 md:px-10 py-3 md:py-4 rounded-full text-base md:text-lg font-bold hover:bg-yellow-300 hover:text-coway-navy transition-all transform hover:scale-105 shadow-xl whitespace-nowrap"
             >
               <span>무료 신청하기</span>
-              <svg className="ml-2 w-4 h-4 md:w-5 md:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="ml-2 w-4 h-4 md:w-5 md:h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
               </svg>
             </Link>
 
             <Link
               to="/board"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3 md:py-4 rounded-full text-base md:text-lg font-semibold hover:bg-white hover:text-coway-blue transition-all"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3 md:py-4 rounded-full text-base md:text-lg font-semibold hover:bg-white hover:text-coway-blue transition-all whitespace-nowrap"
             >
               후기 보기
             </Link>
@@ -307,9 +307,9 @@ function HomePage() {
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
             <Link
               to="/application"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-coway-blue px-8 md:px-12 py-4 md:py-5 rounded-full text-base md:text-xl font-bold hover:bg-yellow-300 hover:text-coway-navy transition-all transform hover:scale-105 shadow-2xl"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-white text-coway-blue px-8 md:px-12 py-4 md:py-5 rounded-full text-base md:text-xl font-bold hover:bg-yellow-300 hover:text-coway-navy transition-all transform hover:scale-105 shadow-2xl whitespace-nowrap"
             >
-              <svg className="w-5 h-5 md:w-6 md:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 md:w-6 md:h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               무료 신청하기
@@ -317,9 +317,9 @@ function HomePage() {
 
             <a
               href="tel:010-2417-7936"
-              className="w-full sm:w-auto inline-flex items-center justify-center bg-transparent border-2 border-white text-white px-8 md:px-12 py-4 md:py-5 rounded-full text-base md:text-xl font-bold hover:bg-white hover:text-coway-blue transition-all"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-transparent border-2 border-white text-white px-8 md:px-12 py-4 md:py-5 rounded-full text-base md:text-xl font-bold hover:bg-white hover:text-coway-blue transition-all whitespace-nowrap"
             >
-              <svg className="w-5 h-5 md:w-6 md:h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 md:w-6 md:h-6 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
               </svg>
               전화 상담하기
