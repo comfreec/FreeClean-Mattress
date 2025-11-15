@@ -46,7 +46,7 @@ function HomePage() {
           </div>
 
           <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold mb-3 md:mb-4 leading-tight px-2">
-            <span className="text-yellow-300 text-4xl sm:text-5xl md:text-6xl lg:text-7xl">15만원 상당</span><br />
+            <span className="text-yellow-300 text-4xl sm:text-5xl md:text-6xl lg:text-7xl">5만원 상당</span><br />
             매트리스 케어를<br />
             <span className="bg-gradient-to-r from-yellow-300 to-green-300 bg-clip-text text-transparent">지금 100% 무료</span>로!
           </h1>
@@ -65,7 +65,7 @@ function HomePage() {
               to="/application"
               className="w-full sm:w-auto inline-flex items-center justify-center bg-gradient-to-r from-yellow-400 via-yellow-300 to-yellow-400 text-gray-900 px-6 sm:px-8 md:px-12 py-4 md:py-5 rounded-full text-base md:text-xl font-black hover:scale-110 transition-all transform shadow-2xl whitespace-nowrap animate-pulse border-4 border-yellow-500"
             >
-              <span>👉 지금 바로 무료 신청 (15만원 혜택!)</span>
+              <span>👉 지금 바로 무료 신청 (5만원 혜택!)</span>
               <svg className="ml-2 w-5 h-5 md:w-6 md:h-6 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M9 5l7 7-7 7" />
               </svg>
@@ -224,7 +224,7 @@ function HomePage() {
                 to="/application"
                 className="inline-flex items-center justify-center bg-gradient-to-r from-yellow-400 to-yellow-300 text-gray-900 px-8 md:px-12 py-4 md:py-5 rounded-full text-lg md:text-xl font-black hover:scale-110 transition-all transform shadow-2xl whitespace-nowrap border-4 border-yellow-500"
               >
-                🎁 지금 무료로 깨끗하게 만들기 (15만원 상당)
+                🎁 지금 무료로 깨끗하게 만들기 (5만원 상당)
               </Link>
             </div>
           </div>
@@ -444,7 +444,7 @@ function HomePage() {
 
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-black mb-4 md:mb-6 px-2 leading-tight">
             지금 신청 안 하시면<br />
-            <span className="text-yellow-300 text-3xl sm:text-4xl md:text-5xl lg:text-6xl">15만원을 내야 합니다!</span>
+            <span className="text-yellow-300 text-3xl sm:text-4xl md:text-5xl lg:text-6xl">5만원을 내야 합니다!</span>
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 md:gap-6 mb-8 md:mb-10 max-w-4xl mx-auto px-4">
@@ -463,7 +463,7 @@ function HomePage() {
           </div>
 
           <p className="text-lg sm:text-xl md:text-2xl mb-6 md:mb-8 text-yellow-100 max-w-2xl mx-auto px-4 font-bold">
-            💰 정상가 15만원 ➜ <span className="text-yellow-300 text-2xl md:text-3xl">지금은 0원!</span>
+            💰 정상가 5만원 ➜ <span className="text-yellow-300 text-2xl md:text-3xl">지금은 0원!</span>
           </p>
 
           <div className="flex flex-col sm:flex-row gap-3 md:gap-4 justify-center px-4">
@@ -493,7 +493,7 @@ function HomePage() {
           </p>
 
           <p className="mt-4 text-xs md:text-sm text-yellow-300 px-4 animate-pulse">
-            ⚠️ 주의: 선착순 마감 시 정상가 15만원으로 유료 전환됩니다
+            ⚠️ 주의: 선착순 마감 시 정상가 5만원으로 유료 전환됩니다
           </p>
         </div>
       </section>
