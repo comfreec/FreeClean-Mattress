@@ -23,6 +23,11 @@ function Header() {
               </Link>
             </li>
             <li>
+              <Link to="/mites" className="text-gray-700 hover:text-coway-blue transition">
+                진드기사진
+              </Link>
+            </li>
+            <li>
               <Link to="/board" className="text-gray-700 hover:text-coway-blue transition">
                 후기 게시판
               </Link>
