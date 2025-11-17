@@ -18,49 +18,49 @@ function MitesPage() {
   ];
 
   return (
-    <div className="py-12 md:py-20 bg-gradient-to-br from-red-50 via-white to-orange-50 min-h-screen">
+    <div className="py-12 md:py-20 bg-gradient-to-br from-red-100 via-orange-50 to-yellow-100 min-h-screen">
       <div className="container mx-auto px-4 max-w-7xl">
         {/* 헤더 */}
         <div className="text-center mb-8 md:mb-16">
-          <div className="inline-block bg-red-100 text-red-600 px-3 md:px-4 py-1.5 md:py-2 rounded-full text-xs md:text-sm font-semibold mb-3 md:mb-4">
-            건강 경고
+          <div className="inline-block bg-gradient-to-r from-red-600 to-orange-600 text-white px-4 md:px-6 py-2 md:py-3 rounded-full text-sm md:text-base font-bold mb-3 md:mb-4 shadow-lg animate-pulse">
+            ⚠️ 건강 경고
           </div>
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 md:mb-4 px-2">
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-3 md:mb-4 px-2">
             진드기 실태
           </h1>
-          <p className="text-base md:text-lg text-gray-600 px-4 max-w-3xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-gray-800 font-medium px-4 max-w-3xl mx-auto leading-relaxed">
             당신의 매트리스에는 지금 이 순간에도 수백만 마리의 진드기가 살고 있습니다.<br/>
             육안으로는 보이지 않지만, 건강에 심각한 영향을 미칩니다.
           </p>
         </div>
 
         {/* 경고 박스 */}
-        <div className="bg-gradient-to-r from-red-50 to-orange-50 border-2 border-red-200 rounded-2xl p-6 md:p-8 mb-12 shadow-lg">
+        <div className="bg-gradient-to-r from-red-600 to-orange-600 rounded-2xl p-6 md:p-8 mb-12 shadow-2xl">
           <div className="flex items-start space-x-4">
             <div className="flex-shrink-0">
-              <svg className="w-8 h-8 md:w-10 md:h-10 text-red-600" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="w-8 h-8 md:w-10 md:h-10 text-yellow-300 animate-pulse" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd"/>
               </svg>
             </div>
             <div className="flex-1">
-              <h3 className="text-xl md:text-2xl font-bold text-gray-900 mb-3">
+              <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
                 진드기로 인한 건강 위협
               </h3>
-              <ul className="space-y-2 text-gray-700">
+              <ul className="space-y-2 text-white">
                 <li className="flex items-start">
-                  <span className="text-red-500 mr-2 font-bold">•</span>
+                  <span className="text-yellow-300 mr-2 font-bold">•</span>
                   <span><strong>알레르기 비염:</strong> 재채기, 콧물, 코막힘 증상</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-red-500 mr-2 font-bold">•</span>
+                  <span className="text-yellow-300 mr-2 font-bold">•</span>
                   <span><strong>아토피 피부염:</strong> 가려움증, 피부 염증 악화</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-red-500 mr-2 font-bold">•</span>
+                  <span className="text-yellow-300 mr-2 font-bold">•</span>
                   <span><strong>천식 유발:</strong> 호흡곤란, 기침 증상 악화</span>
                 </li>
                 <li className="flex items-start">
-                  <span className="text-red-500 mr-2 font-bold">•</span>
+                  <span className="text-yellow-300 mr-2 font-bold">•</span>
                   <span><strong>수면 장애:</strong> 알레르기 반응으로 인한 수면 질 저하</span>
                 </li>
               </ul>
@@ -70,38 +70,38 @@ function MitesPage() {
 
         {/* 진드기 통계 */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-red-100 hover:shadow-xl transition">
+          <div className="bg-gradient-to-br from-red-500 to-red-700 rounded-2xl shadow-2xl p-6 hover:shadow-3xl hover:scale-105 transition-all">
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-red-600 mb-2">200만 마리</div>
-              <p className="text-gray-600 font-medium">일반 매트리스의 평균 진드기 개체수</p>
+              <div className="text-4xl md:text-5xl font-bold text-white mb-2">200만 마리</div>
+              <p className="text-red-100 font-semibold">일반 매트리스의 평균 진드기 개체수</p>
             </div>
           </div>
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-orange-100 hover:shadow-xl transition">
+          <div className="bg-gradient-to-br from-orange-500 to-orange-700 rounded-2xl shadow-2xl p-6 hover:shadow-3xl hover:scale-105 transition-all">
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-orange-600 mb-2">0.3mm</div>
-              <p className="text-gray-600 font-medium">집먼지진드기의 평균 크기 (육안 불가)</p>
+              <div className="text-4xl md:text-5xl font-bold text-white mb-2">0.3mm</div>
+              <p className="text-orange-100 font-semibold">집먼지진드기의 평균 크기 (육안 불가)</p>
             </div>
           </div>
-          <div className="bg-white rounded-2xl shadow-lg p-6 border-2 border-red-100 hover:shadow-xl transition">
+          <div className="bg-gradient-to-br from-red-600 to-pink-700 rounded-2xl shadow-2xl p-6 hover:shadow-3xl hover:scale-105 transition-all">
             <div className="text-center">
-              <div className="text-4xl md:text-5xl font-bold text-red-600 mb-2">3개월</div>
-              <p className="text-gray-600 font-medium">진드기 개체수가 2배로 증가하는 기간</p>
+              <div className="text-4xl md:text-5xl font-bold text-white mb-2">3개월</div>
+              <p className="text-red-100 font-semibold">진드기 개체수가 2배로 증가하는 기간</p>
             </div>
           </div>
         </div>
 
         {/* 이미지 갤러리 */}
         <div className="mb-12">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
-            진드기 사진
+          <h2 className="text-2xl md:text-3xl font-bold bg-gradient-to-r from-red-600 to-orange-600 bg-clip-text text-transparent mb-8 text-center">
+            진드기 현미경 사진
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {miteImages.map((imageUrl, index) => (
               <div key={index} className="group cursor-pointer">
-                <div className="aspect-square relative overflow-hidden rounded-xl bg-gray-100 shadow-lg hover:shadow-2xl transition">
+                <div className="aspect-square relative overflow-hidden rounded-xl bg-gray-100 shadow-xl hover:shadow-2xl hover:ring-4 hover:ring-red-400 transition-all">
                   <img
                     src={imageUrl}
-                    alt={`진드기 관련 사진 ${index + 1}`}
+                    alt={`진드기 현미경 사진 ${index + 1}`}
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     loading="lazy"
                   />
