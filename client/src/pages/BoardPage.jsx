@@ -52,7 +52,7 @@ function BoardPage() {
           </div>
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-3 md:mb-4 px-2">후기 게시판</h1>
           <p className="text-base md:text-lg text-gray-600 px-4">
-            매트리스 케어 서비스를 이용하신 고객님들의 생생한 후기
+            매트리스 케어 서비스를 이용하신 분들의 생생한 후기
           </p>
         </div>
 
