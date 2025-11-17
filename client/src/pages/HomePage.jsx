@@ -77,6 +77,13 @@ function HomePage() {
             </Link>
 
             <Link
+              to="/mites"
+              className="w-full sm:w-auto inline-flex items-center justify-center bg-gradient-to-r from-red-500 to-orange-500 text-white px-6 sm:px-8 py-3 md:py-4 rounded-full text-sm md:text-base font-bold hover:scale-105 transition-all shadow-xl whitespace-nowrap border-2 border-red-400"
+            >
+              ⚠️ 진드기 사진 보기 (충격주의)
+            </Link>
+
+            <Link
               to="/board"
               className="w-full sm:w-auto inline-flex items-center justify-center bg-transparent border-2 border-white text-white px-6 sm:px-8 py-3 md:py-4 rounded-full text-sm md:text-base font-semibold hover:bg-white hover:text-coway-blue transition-all whitespace-nowrap"
             >
