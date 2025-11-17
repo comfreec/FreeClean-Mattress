@@ -250,6 +250,7 @@ export default async function handler(req, res) {
           id: doc.id,
           title: data.title,
           author: data.author,
+          rating: data.rating || 0,
           views: data.views || 0,
           created_at: data.created_at?.toDate().toISOString(),
           comment_count: commentsSnapshot.data().count
