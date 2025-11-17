@@ -348,6 +348,30 @@ export default async function handler(req, res) {
       });
     }
 
+    // 12. 게시글 삭제
+    if (path.startsWith('/posts/') && method === 'DELETE') {
+      const id = path.split('/')[2];
+
+      // 게시글 삭제
+      await db.collection('posts').doc(id).delete();
+
+      // 해당 게시글의 댓글도 삭제
+      const commentsSnapshot = await db.collection('comments')
+        .where('post_id', '==', id)
+        .get();
+
+      const batch = db.batch();
+      commentsSnapshot.docs.forEach(doc => {
+        batch.delete(doc.ref);
+      });
+      await batch.commit();
+
+      return res.json({
+        success: true,
+        message: '게시글이 삭제되었습니다.'
+      });
+    }
+
     // 매칭되는 라우트가 없음
     return res.status(404).json({
       success: false,

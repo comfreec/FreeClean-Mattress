@@ -14,8 +14,10 @@ function AdminPage() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [applications, setApplications] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [stats, setStats] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [activeTab, setActiveTab] = useState('applications'); // 'applications' or 'posts'
   const [loading, setLoading] = useState(true);
 
   // 페이지 로드 시 인증 상태 확인
@@ -31,9 +33,13 @@ function AdminPage() {
   // 인증된 경우에만 데이터 로드
   useEffect(() => {
     if (isAuthenticated) {
-      fetchData();
+      if (activeTab === 'applications') {
+        fetchData();
+      } else {
+        fetchPosts();
+      }
     }
-  }, [filter, isAuthenticated]);
+  }, [filter, isAuthenticated, activeTab]);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -121,6 +127,42 @@ function AdminPage() {
       if (response.data.success) {
         alert('신청이 삭제되었습니다.');
         fetchData();
+      }
+    } catch (error) {
+      console.error('삭제 실패:', error);
+      alert('삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  // 후기 목록 조회
+  const fetchPosts = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/api/posts');
+
+      if (response.data.success) {
+        setPosts(response.data.posts);
+      }
+    } catch (error) {
+      console.error('후기 로딩 실패:', error);
+      alert('후기를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 후기 삭제
+  const deletePost = async (id, title) => {
+    if (!confirm(`"${title}" 후기를 삭제하시겠습니까?\n이 작업은 되돌릴 수 없습니다.`)) {
+      return;
+    }
+
+    try {
+      const response = await api.delete(`/api/posts/${id}`);
+
+      if (response.data.success) {
+        alert('후기가 삭제되었습니다.');
+        fetchPosts();
       }
     } catch (error) {
       console.error('삭제 실패:', error);
@@ -217,6 +259,34 @@ function AdminPage() {
           </button>
         </div>
 
+        {/* 탭 버튼 */}
+        <div className="bg-white p-4 rounded-lg shadow mb-8">
+          <div className="flex space-x-2">
+            <button
+              onClick={() => setActiveTab('applications')}
+              className={`px-6 py-3 rounded-lg font-semibold transition ${
+                activeTab === 'applications'
+                  ? 'bg-coway-blue text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              📋 신청 관리
+            </button>
+            <button
+              onClick={() => setActiveTab('posts')}
+              className={`px-6 py-3 rounded-lg font-semibold transition ${
+                activeTab === 'posts'
+                  ? 'bg-coway-blue text-white'
+                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+              }`}
+            >
+              ⭐ 후기 관리
+            </button>
+          </div>
+        </div>
+
+        {activeTab === 'applications' && (
+          <>
         {/* 통계 카드 */}
         {stats && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
@@ -467,6 +537,105 @@ function AdminPage() {
             </div>
           )}
         </div>
+          </>
+        )}
+
+        {/* 후기 관리 탭 */}
+        {activeTab === 'posts' && (
+          <div className="bg-white rounded-lg shadow overflow-hidden">
+            <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-blue-50 border-b">
+              <h2 className="text-xl font-bold text-gray-900">후기 게시판 관리</h2>
+              <p className="text-sm text-gray-600 mt-1">총 {posts.length}개의 후기</p>
+            </div>
+
+            {/* 모바일 카드 뷰 */}
+            <div className="block md:hidden">
+              {posts.length === 0 ? (
+                <div className="text-center py-12 text-gray-500">
+                  등록된 후기가 없습니다
+                </div>
+              ) : (
+                posts.map((post) => (
+                  <div key={post.id} className="border-b border-gray-200 p-4 hover:bg-gray-50">
+                    <div className="mb-3">
+                      <h3 className="font-bold text-lg text-gray-900 mb-1">{post.title}</h3>
+                      <div className="flex items-center space-x-3 text-sm text-gray-500">
+                        <span>{post.author}</span>
+                        {post.rating > 0 && (
+                          <span className="text-yellow-500">{'⭐'.repeat(post.rating)}</span>
+                        )}
+                        <span>조회 {post.views}</span>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => deletePost(post.id, post.title)}
+                      className="w-full bg-red-500 text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-red-600 transition"
+                    >
+                      🗑️ 삭제
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+
+            {/* 데스크톱 테이블 뷰 */}
+            <div className="hidden md:block overflow-x-auto">
+              <table className="w-full">
+                <thead className="bg-gray-50">
+                  <tr>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">제목</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-32">작성자</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">별점</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">조회</th>
+                    <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-24">삭제</th>
+                  </tr>
+                </thead>
+                <tbody className="bg-white divide-y divide-gray-200">
+                  {posts.length === 0 ? (
+                    <tr>
+                      <td colSpan="5" className="px-6 py-12 text-center text-gray-500">
+                        등록된 후기가 없습니다
+                      </td>
+                    </tr>
+                  ) : (
+                    posts.map((post) => (
+                      <tr key={post.id} className="hover:bg-gray-50">
+                        <td className="px-6 py-4 text-sm font-medium text-gray-900">
+                          {post.title}
+                          {post.comment_count > 0 && (
+                            <span className="ml-2 bg-coway-blue text-white text-xs px-2 py-0.5 rounded-full">
+                              {post.comment_count}
+                            </span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-600">{post.author}</td>
+                        <td className="px-6 py-4 text-sm text-center">
+                          {post.rating > 0 ? (
+                            <span className="text-yellow-500">{'⭐'.repeat(post.rating)}</span>
+                          ) : (
+                            <span className="text-gray-300">-</span>
+                          )}
+                        </td>
+                        <td className="px-6 py-4 text-sm text-gray-500 text-center">{post.views}</td>
+                        <td className="px-6 py-4 text-center">
+                          <button
+                            onClick={() => deletePost(post.id, post.title)}
+                            className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition font-semibold inline-flex items-center space-x-1"
+                          >
+                            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                              <path fillRule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clipRule="evenodd"/>
+                            </svg>
+                            <span>삭제</span>
+                          </button>
+                        </td>
+                      </tr>
+                    ))
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
