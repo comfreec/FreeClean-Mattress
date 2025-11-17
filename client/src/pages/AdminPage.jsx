@@ -56,23 +56,18 @@ function AdminPage() {
   const fetchData = async () => {
     setLoading(true);
     try {
-      // 필터링된 데이터 가져오기
-      const response = await api.get('/api/applications', {
-        params: filter !== 'all' ? { status: filter } : {}
-      });
+      // 항상 전체 데이터 가져오기 (query parameter 문제 회피)
+      const response = await api.get('/api/applications');
 
       if (response.data.success) {
-        const displayApps = response.data.applications;
-        setApplications(displayApps);
+        const allApps = response.data.applications;
 
-        // 필터가 적용된 경우 전체 데이터도 가져와서 통계 계산
-        let allApps = displayApps;
-        if (filter !== 'all') {
-          const allResponse = await api.get('/api/applications');
-          if (allResponse.data.success) {
-            allApps = allResponse.data.applications;
-          }
-        }
+        // 클라이언트 측에서 필터링
+        const filteredApps = filter === 'all'
+          ? allApps
+          : allApps.filter(app => app.status === filter);
+
+        setApplications(filteredApps);
 
         // 전체 데이터로 통계 계산
         const calculatedStats = {
