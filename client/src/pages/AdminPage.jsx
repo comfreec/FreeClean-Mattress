@@ -429,11 +429,17 @@ function AdminPage() {
           {/* 모바일 카드 뷰 */}
           <div className="block md:hidden">
             {applications.map((app) => (
-              <div key={app.id} className={`border-b border-gray-200 p-4 ${
-                app.status === 'completed'
-                  ? 'bg-green-50 hover:bg-green-100'
-                  : 'hover:bg-gray-50'
-              }`}>
+              <div
+                key={app.id}
+                className={`border-b border-gray-200 p-4 relative ${
+                  app.status === 'completed'
+                    ? 'bg-gray-100 hover:bg-gray-200'
+                    : 'hover:bg-gray-50'
+                }`}
+                style={app.status === 'completed' ? {
+                  backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.1) 10px, rgba(0, 0, 0, 0.1) 20px)'
+                } : {}}
+              >
                 <div className="flex justify-between items-start mb-3">
                   <div>
                     <div className="flex items-center gap-2">
@@ -573,11 +579,17 @@ function AdminPage() {
               </thead>
               <tbody className="bg-white divide-y divide-gray-200">
                 {applications.map((app) => (
-                  <tr key={app.id} className={
-                    app.status === 'completed'
-                      ? 'bg-green-50 hover:bg-green-100'
-                      : 'hover:bg-gray-50'
-                  }>
+                  <tr
+                    key={app.id}
+                    className={
+                      app.status === 'completed'
+                        ? 'bg-gray-100 hover:bg-gray-200'
+                        : 'hover:bg-gray-50'
+                    }
+                    style={app.status === 'completed' ? {
+                      backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 10px, rgba(0, 0, 0, 0.1) 10px, rgba(0, 0, 0, 0.1) 20px)'
+                    } : {}}
+                  >
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                       {formatDate(app.created_at)}
                     </td>
