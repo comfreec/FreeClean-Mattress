@@ -7,13 +7,18 @@ async function sendTelegramNotification(applicationData) {
   const TELEGRAM_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
   const TELEGRAM_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
 
+  console.log('텔레그램 환경변수 확인:', {
+    hasToken: !!TELEGRAM_BOT_TOKEN,
+    hasChat: !!TELEGRAM_CHAT_ID,
+    chatId: TELEGRAM_CHAT_ID
+  });
+
   if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
     console.log('텔레그램 설정이 없습니다. 알림을 건너뜁니다.');
     return;
   }
 
-  const message = `
-🔔 새로운 매트리스 케어 신청!
+  const message = `🔔 새로운 매트리스 케어 신청!
 
 👤 이름: ${applicationData.name}
 📱 전화번호: ${applicationData.phone}
@@ -22,33 +27,55 @@ async function sendTelegramNotification(applicationData) {
 ⏰ 사용 기간: ${applicationData.mattress_age || '미입력'}
 📅 희망 날짜: ${applicationData.preferred_date || '미입력'}
 🕐 희망 시간: ${applicationData.preferred_time || '미입력'}
-💬 메시지: ${applicationData.message || '없음'}
-  `.trim();
+💬 메시지: ${applicationData.message || '없음'}`;
+
+  const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+  const payload = {
+    chat_id: TELEGRAM_CHAT_ID,
+    text: message
+  };
+
+  console.log('텔레그램 전송 시도:', url.substring(0, 50) + '...');
 
   try {
-    const response = await fetch(
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: message,
-          parse_mode: 'HTML'
-        })
-      }
-    );
+    const https = await import('https');
+    const data = JSON.stringify(payload);
 
-    const result = await response.json();
-    if (result.ok) {
-      console.log('텔레그램 알림 전송 성공');
-    } else {
-      console.error('텔레그램 알림 전송 실패:', result);
-    }
+    const options = {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Content-Length': data.length
+      }
+    };
+
+    return new Promise((resolve, reject) => {
+      const req = https.request(url, options, (res) => {
+        let body = '';
+        res.on('data', (chunk) => body += chunk);
+        res.on('end', () => {
+          console.log('텔레그램 응답:', body);
+          if (res.statusCode === 200) {
+            console.log('✅ 텔레그램 알림 전송 성공');
+            resolve(true);
+          } else {
+            console.error('❌ 텔레그램 알림 전송 실패:', body);
+            resolve(false);
+          }
+        });
+      });
+
+      req.on('error', (error) => {
+        console.error('❌ 텔레그램 요청 중 오류:', error);
+        reject(error);
+      });
+
+      req.write(data);
+      req.end();
+    });
   } catch (error) {
-    console.error('텔레그램 알림 전송 중 오류:', error);
+    console.error('❌ 텔레그램 알림 전송 중 오류:', error);
+    throw error;
   }
 }
 
