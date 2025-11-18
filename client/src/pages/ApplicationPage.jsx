@@ -37,6 +37,9 @@ function ApplicationPage() {
       const response = await axios.post('/api/applications', formData);
 
       if (response.data.success) {
+        // 알림창 표시
+        alert('무료 케어 신청이 완료되었습니다!\n곧 연락드리겠습니다.');
+
         setSubmitStatus({
           type: 'success',
           message: '신청이 완료되었습니다! 곧 연락드리겠습니다.'
