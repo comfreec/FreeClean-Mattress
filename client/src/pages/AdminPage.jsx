@@ -17,6 +17,7 @@ function AdminPage() {
   const [posts, setPosts] = useState([]);
   const [stats, setStats] = useState(null);
   const [filter, setFilter] = useState('all');
+  const [searchDate, setSearchDate] = useState(''); // 날짜 검색
   const [activeTab, setActiveTab] = useState('applications'); // 'applications' or 'posts'
   const [loading, setLoading] = useState(true);
 
@@ -40,7 +41,7 @@ function AdminPage() {
         fetchPosts();
       }
     }
-  }, [filter, isAuthenticated, activeTab]);
+  }, [filter, searchDate, isAuthenticated, activeTab]);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -69,10 +70,22 @@ function AdminPage() {
       if (response.data.success) {
         const allApps = response.data.applications;
 
-        // 클라이언트 측에서 필터링
-        const filteredApps = filter === 'all'
-          ? allApps
-          : allApps.filter(app => app.status === filter);
+        // 클라이언트 측에서 필터링 (상태 + 날짜)
+        let filteredApps = allApps;
+
+        // 상태 필터링
+        if (filter !== 'all') {
+          filteredApps = filteredApps.filter(app => app.status === filter);
+        }
+
+        // 날짜 필터링 (연락 희망 날짜 기준)
+        if (searchDate) {
+          filteredApps = filteredApps.filter(app => {
+            if (!app.preferred_date) return false;
+            // preferred_date가 YYYY-MM-DD 형식이라고 가정
+            return app.preferred_date === searchDate;
+          });
+        }
 
         setApplications(filteredApps);
 
@@ -320,47 +333,70 @@ function AdminPage() {
 
         {/* 필터 버튼 */}
         <div className="bg-white p-4 rounded-lg shadow mb-6">
-          <div className="flex space-x-2">
-            <button
-              onClick={() => setFilter('all')}
-              className={`px-4 py-2 rounded ${
-                filter === 'all'
-                  ? 'bg-coway-blue text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              전체
-            </button>
-            <button
-              onClick={() => setFilter('pending')}
-              className={`px-4 py-2 rounded ${
-                filter === 'pending'
-                  ? 'bg-coway-blue text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              대기중
-            </button>
-            <button
-              onClick={() => setFilter('confirmed')}
-              className={`px-4 py-2 rounded ${
-                filter === 'confirmed'
-                  ? 'bg-coway-blue text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              확정
-            </button>
-            <button
-              onClick={() => setFilter('completed')}
-              className={`px-4 py-2 rounded ${
-                filter === 'completed'
-                  ? 'bg-coway-blue text-white'
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              완료
-            </button>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+            <div className="flex space-x-2">
+              <button
+                onClick={() => setFilter('all')}
+                className={`px-4 py-2 rounded ${
+                  filter === 'all'
+                    ? 'bg-coway-blue text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                전체
+              </button>
+              <button
+                onClick={() => setFilter('pending')}
+                className={`px-4 py-2 rounded ${
+                  filter === 'pending'
+                    ? 'bg-coway-blue text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                대기중
+              </button>
+              <button
+                onClick={() => setFilter('confirmed')}
+                className={`px-4 py-2 rounded ${
+                  filter === 'confirmed'
+                    ? 'bg-coway-blue text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                확정
+              </button>
+              <button
+                onClick={() => setFilter('completed')}
+                className={`px-4 py-2 rounded ${
+                  filter === 'completed'
+                    ? 'bg-coway-blue text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                완료
+              </button>
+            </div>
+
+            {/* 날짜 검색 */}
+            <div className="flex items-center space-x-2">
+              <label className="text-sm font-semibold text-gray-700 whitespace-nowrap">
+                📅 연락 희망 날짜:
+              </label>
+              <input
+                type="date"
+                value={searchDate}
+                onChange={(e) => setSearchDate(e.target.value)}
+                className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-coway-blue"
+              />
+              {searchDate && (
+                <button
+                  onClick={() => setSearchDate('')}
+                  className="bg-gray-500 text-white px-3 py-2 rounded-lg hover:bg-gray-600 transition text-sm"
+                >
+                  초기화
+                </button>
+              )}
+            </div>
           </div>
         </div>
 
@@ -390,6 +426,14 @@ function AdminPage() {
                   <div>
                     <span className="font-semibold">매트리스:</span> {app.mattress_type || '-'} ({app.mattress_age || '-'})
                   </div>
+                  {(app.preferred_date || app.preferred_time) && (
+                    <div className="bg-blue-50 p-2 rounded border border-blue-200">
+                      <span className="font-semibold text-blue-800">📅 연락 희망:</span>
+                      <div className="text-blue-700">
+                        {app.preferred_date || '-'} {app.preferred_time || ''}
+                      </div>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-4 space-y-2">
@@ -447,6 +491,9 @@ function AdminPage() {
                     매트리스 정보
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    연락 희망일시
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     상태
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
@@ -479,6 +526,16 @@ function AdminPage() {
                     <td className="px-6 py-4 text-sm text-gray-500">
                       <div>{app.mattress_type || '-'}</div>
                       <div className="text-xs text-gray-400">{app.mattress_age || '-'}</div>
+                    </td>
+                    <td className="px-6 py-4 text-sm text-gray-700">
+                      {app.preferred_date || app.preferred_time ? (
+                        <div className="bg-blue-50 p-2 rounded border border-blue-200">
+                          <div className="font-semibold text-blue-800">{app.preferred_date || '-'}</div>
+                          <div className="text-xs text-blue-600">{app.preferred_time || '-'}</div>
+                        </div>
+                      ) : (
+                        <span className="text-gray-400">미입력</span>
+                      )}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {getStatusBadge(app.status)}
