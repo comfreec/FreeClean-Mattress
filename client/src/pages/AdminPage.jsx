@@ -70,15 +70,10 @@ function AdminPage() {
       if (response.data.success) {
         const allApps = response.data.applications;
 
-        // 클라이언트 측에서 필터링 (상태 + 날짜)
+        // 클라이언트 측에서 필터링 (상태 또는 날짜)
         let filteredApps = allApps;
 
-        // 상태 필터링
-        if (filter !== 'all') {
-          filteredApps = filteredApps.filter(app => app.status === filter);
-        }
-
-        // 날짜 필터링 (컨택 날짜 기준, 완료건 제외)
+        // 날짜 검색이 우선 (날짜가 선택되어 있으면 날짜로만 필터링)
         if (searchDate) {
           filteredApps = filteredApps.filter(app => {
             if (!app.preferred_date) return false;
@@ -87,6 +82,10 @@ function AdminPage() {
             // preferred_date가 YYYY-MM-DD 형식이라고 가정
             return app.preferred_date === searchDate;
           });
+        }
+        // 날짜 검색이 없을 때만 상태 필터링 적용
+        else if (filter !== 'all') {
+          filteredApps = filteredApps.filter(app => app.status === filter);
         }
 
         setApplications(filteredApps);
