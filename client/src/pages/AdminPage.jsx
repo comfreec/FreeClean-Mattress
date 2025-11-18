@@ -207,7 +207,7 @@ function AdminPage() {
   const getStatusBadge = (status) => {
     const statusMap = {
       pending: { text: '대기중', color: 'bg-yellow-100 text-yellow-800' },
-      confirmed: { text: '확정', color: 'bg-blue-100 text-blue-800' },
+      confirmed: { text: '컨택완료', color: 'bg-blue-100 text-blue-800' },
       completed: { text: '완료', color: 'bg-green-100 text-green-800' },
       cancelled: { text: '취소', color: 'bg-red-100 text-red-800' }
     };
@@ -343,7 +343,7 @@ function AdminPage() {
               </div>
             </div>
             <div className="bg-white p-4 md:p-6 rounded-lg shadow">
-              <div className="text-gray-500 text-xs md:text-sm mb-2">확정</div>
+              <div className="text-gray-500 text-xs md:text-sm mb-2">컨택완료</div>
               <div className="text-2xl md:text-3xl font-bold text-blue-600">
                 {stats.confirmedApplications}
               </div>
@@ -362,7 +362,10 @@ function AdminPage() {
           <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div className="flex space-x-2">
               <button
-                onClick={() => setFilter('all')}
+                onClick={() => {
+                  setFilter('all');
+                  setSearchDate('');
+                }}
                 className={`px-4 py-2 rounded ${
                   filter === 'all'
                     ? 'bg-coway-blue text-white'
@@ -372,7 +375,10 @@ function AdminPage() {
                 전체
               </button>
               <button
-                onClick={() => setFilter('pending')}
+                onClick={() => {
+                  setFilter('pending');
+                  setSearchDate('');
+                }}
                 className={`px-4 py-2 rounded ${
                   filter === 'pending'
                     ? 'bg-coway-blue text-white'
@@ -382,17 +388,23 @@ function AdminPage() {
                 대기중
               </button>
               <button
-                onClick={() => setFilter('confirmed')}
+                onClick={() => {
+                  setFilter('confirmed');
+                  setSearchDate('');
+                }}
                 className={`px-4 py-2 rounded ${
                   filter === 'confirmed'
                     ? 'bg-coway-blue text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
               >
-                확정
+                컨택완료
               </button>
               <button
-                onClick={() => setFilter('completed')}
+                onClick={() => {
+                  setFilter('completed');
+                  setSearchDate('');
+                }}
                 className={`px-4 py-2 rounded ${
                   filter === 'completed'
                     ? 'bg-coway-blue text-white'
@@ -518,7 +530,7 @@ function AdminPage() {
                     className="w-full border-2 border-coway-blue rounded-lg px-4 py-3 text-base font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-coway-blue"
                   >
                     <option value="pending">대기중</option>
-                    <option value="confirmed">확정</option>
+                    <option value="confirmed">컨택완료</option>
                     <option value="completed">완료</option>
                     <option value="cancelled">취소</option>
                   </select>
@@ -664,7 +676,7 @@ function AdminPage() {
                         className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-coway-blue"
                       >
                         <option value="pending">대기중</option>
-                        <option value="confirmed">확정</option>
+                        <option value="confirmed">컨택완료</option>
                         <option value="completed">완료</option>
                         <option value="cancelled">취소</option>
                       </select>
