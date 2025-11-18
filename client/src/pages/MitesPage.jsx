@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 
 function MitesPage() {
   const miteImages = [
@@ -19,10 +19,31 @@ function MitesPage() {
     "/images/mite15.png"
   ];
 
+  const [selectedImage, setSelectedImage] = useState(null);
+
   // 페이지 로드 시 스크롤을 맨 위로
   useEffect(() => {
     window.scrollTo(0, 0);
   }, []);
+
+  // ESC 키로 모달 닫기
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        setSelectedImage(null);
+      }
+    };
+
+    if (selectedImage !== null) {
+      document.addEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'hidden'; // 스크롤 방지
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.body.style.overflow = 'unset';
+    };
+  }, [selectedImage]);
 
   return (
     <div className="py-12 md:py-20 bg-gradient-to-br from-red-100 via-orange-50 to-yellow-100 min-h-screen">
@@ -104,7 +125,11 @@ function MitesPage() {
           </h2>
           <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
             {miteImages.map((imageUrl, index) => (
-              <div key={index} className="group cursor-pointer">
+              <div
+                key={index}
+                className="group cursor-pointer"
+                onClick={() => setSelectedImage(index)}
+              >
                 <div className="aspect-square relative overflow-hidden rounded-xl bg-gray-100 shadow-xl hover:shadow-2xl hover:ring-4 hover:ring-red-400 transition-all">
                   <img
                     src={imageUrl}
@@ -112,6 +137,12 @@ function MitesPage() {
                     className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                     loading="lazy"
                   />
+                  <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-20 transition-all flex items-center justify-center">
+                    <svg className="w-12 h-12 text-white opacity-0 group-hover:opacity-100 transition-opacity" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                      <path fillRule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clipRule="evenodd"/>
+                    </svg>
+                  </div>
                 </div>
               </div>
             ))}
@@ -148,6 +179,71 @@ function MitesPage() {
             </a>
           </div>
         </div>
+
+        {/* 이미지 확대 모달 */}
+        {selectedImage !== null && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-90 z-50 flex items-center justify-center p-4"
+            onClick={() => setSelectedImage(null)}
+          >
+            <div className="relative max-w-5xl w-full max-h-[90vh]">
+              {/* 닫기 버튼 */}
+              <button
+                onClick={() => setSelectedImage(null)}
+                className="absolute -top-12 right-0 text-white hover:text-red-400 transition-colors"
+              >
+                <svg className="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+
+              {/* 이전 버튼 */}
+              {selectedImage > 0 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedImage(selectedImage - 1);
+                  }}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-40 text-white p-3 rounded-full transition-all"
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                  </svg>
+                </button>
+              )}
+
+              {/* 다음 버튼 */}
+              {selectedImage < miteImages.length - 1 && (
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setSelectedImage(selectedImage + 1);
+                  }}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-white bg-opacity-20 hover:bg-opacity-40 text-white p-3 rounded-full transition-all"
+                >
+                  <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              )}
+
+              {/* 확대된 이미지 */}
+              <div
+                className="bg-white rounded-xl overflow-hidden shadow-2xl"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <img
+                  src={miteImages[selectedImage]}
+                  alt={`진드기 현미경 사진 ${selectedImage + 1}`}
+                  className="w-full h-auto"
+                />
+                <div className="p-4 bg-gradient-to-r from-red-600 to-orange-600 text-white text-center">
+                  <p className="font-bold">진드기 현미경 사진 {selectedImage + 1} / {miteImages.length}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
