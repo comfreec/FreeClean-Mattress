@@ -30,6 +30,20 @@ function AdminPage() {
   // 페이지 로드 시 인증 상태 확인
   useEffect(() => {
     window.scrollTo(0, 0);
+
+    // URL 파라미터로 자동 로그인 확인
+    const urlParams = new URLSearchParams(window.location.search);
+    const autoKey = urlParams.get('key');
+
+    // 특별한 키로 자동 로그인 (북마크용)
+    if (autoKey === 'coway2024') {
+      setIsAuthenticated(true);
+      sessionStorage.setItem('adminAuth', 'authenticated');
+      // URL에서 key 파라미터 제거 (보안)
+      window.history.replaceState({}, '', '/admin');
+      return;
+    }
+
     const auth = sessionStorage.getItem('adminAuth');
     if (auth === 'authenticated') {
       setIsAuthenticated(true);
