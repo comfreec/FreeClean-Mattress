@@ -25,8 +25,6 @@ async function sendTelegramNotification(applicationData) {
 📍 주소: ${applicationData.address} ${applicationData.detail_address || ''}
 🛏️ 매트리스 종류: ${applicationData.mattress_type || '미입력'}
 ⏰ 사용 기간: ${applicationData.mattress_age || '미입력'}
-📅 희망 날짜: ${applicationData.preferred_date || '미입력'}
-🕐 희망 시간: ${applicationData.preferred_time || '미입력'}
 💬 메시지: ${applicationData.message || '없음'}`;
 
   const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
