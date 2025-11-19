@@ -410,17 +410,11 @@ function AdminPage() {
           <>
         {/* 통계 카드 */}
         {stats && (
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 md:gap-6 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mb-8">
             <div className="bg-white p-4 md:p-6 rounded-lg shadow">
               <div className="text-gray-500 text-xs md:text-sm mb-2">총 신청</div>
               <div className="text-2xl md:text-3xl font-bold text-coway-blue">
                 {stats.totalApplications}
-              </div>
-            </div>
-            <div className="bg-white p-4 md:p-6 rounded-lg shadow">
-              <div className="text-gray-500 text-xs md:text-sm mb-2">컨택완료</div>
-              <div className="text-2xl md:text-3xl font-bold text-green-600">
-                {stats.contactedApplications}
               </div>
             </div>
             <div className="bg-white p-4 md:p-6 rounded-lg shadow">
@@ -437,7 +431,7 @@ function AdminPage() {
             </div>
             <div className="bg-white p-4 md:p-6 rounded-lg shadow">
               <div className="text-gray-500 text-xs md:text-sm mb-2">완료</div>
-              <div className="text-2xl md:text-3xl font-bold text-purple-600">
+              <div className="text-2xl md:text-3xl font-bold text-green-600">
                 {stats.completedApplications}
               </div>
             </div>
