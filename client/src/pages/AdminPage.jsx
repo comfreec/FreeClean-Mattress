@@ -19,6 +19,7 @@ function AdminPage() {
   const [filter, setFilter] = useState('all');
   const [searchDate, setSearchDate] = useState(''); // 날짜 검색
   const [activeTab, setActiveTab] = useState('applications'); // 'applications' or 'posts'
+  const [viewArchived, setViewArchived] = useState(false); // 보관함 보기
   const [loading, setLoading] = useState(true);
 
   // 페이지 로드 시 인증 상태 확인
@@ -41,7 +42,7 @@ function AdminPage() {
         fetchPosts();
       }
     }
-  }, [filter, searchDate, isAuthenticated, activeTab]);
+  }, [filter, searchDate, isAuthenticated, activeTab, viewArchived]);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -61,9 +62,33 @@ function AdminPage() {
     setPassword('');
   };
 
+  const fetchArchivedData = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/api/archived-applications');
+
+      if (response.data.success) {
+        setApplications(response.data.applications);
+        // 보관함은 통계 없음
+        setStats(null);
+      }
+    } catch (error) {
+      console.error('보관함 로딩 실패:', error);
+      alert('보관함을 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchData = async () => {
     setLoading(true);
     try {
+      // 보관함 보기 모드라면 보관된 데이터 가져오기
+      if (viewArchived) {
+        fetchArchivedData();
+        return;
+      }
+
       // 항상 전체 데이터 가져오기 (query parameter 문제 회피)
       const response = await api.get('/api/applications');
 
@@ -186,6 +211,24 @@ function AdminPage() {
     } catch (error) {
       console.error('삭제 실패:', error);
       alert('삭제 중 오류가 발생했습니다.');
+    }
+  };
+
+  const archiveCompleted = async () => {
+    if (!confirm('완료 처리된 모든 항목을 보관함으로 이동하시겠습니까?')) {
+      return;
+    }
+
+    try {
+      const response = await api.post('/api/applications/archive');
+
+      if (response.data.success) {
+        alert(response.data.message);
+        fetchData();
+      }
+    } catch (error) {
+      console.error('보관 실패:', error);
+      alert('보관 중 오류가 발생했습니다.');
     }
   };
 
@@ -380,8 +423,9 @@ function AdminPage() {
 
         {/* 필터 버튼 */}
         <div className="bg-white p-4 rounded-lg shadow mb-6">
-          <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-            <div className="flex space-x-2">
+          <div className="flex flex-col gap-4">
+            {/* 상태 필터 */}
+            <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={() => setFilter('all')}
                 className={`px-4 py-2 rounded ${
@@ -444,11 +488,55 @@ function AdminPage() {
                 </button>
               )}
             </div>
+
+            {/* 보관함 관리 */}
+            <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-gray-200">
+              {!viewArchived && (
+                <button
+                  onClick={archiveCompleted}
+                  className="bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition font-semibold"
+                >
+                  📦 완료처리보관
+                </button>
+              )}
+              <button
+                onClick={() => {
+                  setViewArchived(!viewArchived);
+                  setSearchDate('');
+                  setFilter('all');
+                }}
+                className={`px-4 py-2 rounded-lg font-semibold transition ${
+                  viewArchived
+                    ? 'bg-orange-600 text-white hover:bg-orange-700'
+                    : 'bg-gray-600 text-white hover:bg-gray-700'
+                }`}
+              >
+                {viewArchived ? '🔙 일반보기' : '📋 완료처리건보기'}
+              </button>
+              {viewArchived && (
+                <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold">
+                  보관함 보기 중
+                </span>
+              )}
+            </div>
           </div>
         </div>
 
         {/* 신청 목록 */}
         <div className="bg-white rounded-lg shadow overflow-hidden">
+          {/* 헤더 */}
+          <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-blue-50 border-b">
+            <h2 className="text-xl font-bold text-gray-900">
+              {viewArchived ? '📦 보관된 항목' : '📋 신청 내역'}
+            </h2>
+            <p className="text-sm text-gray-600 mt-1">
+              {viewArchived
+                ? `총 ${applications.length}개의 보관된 항목`
+                : `총 ${applications.length}개의 신청`
+              }
+            </p>
+          </div>
+
           {/* 모바일 카드 뷰 */}
           <div className="block md:hidden">
             {applications.map((app) => (
@@ -469,13 +557,19 @@ function AdminPage() {
                   <div>
                     <div className="flex items-center gap-2">
                       <div className="font-bold text-lg text-gray-900">{app.name}</div>
-                      {app.preferred_date && app.preferred_time && (
+                      {app.preferred_date && app.preferred_time && !viewArchived && (
                         <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold">
                           ✓ 컨택완료
                         </span>
                       )}
                     </div>
-                    <div className="text-sm text-gray-500">{formatDate(app.created_at)}</div>
+                    <div className="text-sm text-gray-500">
+                      {viewArchived && app.archived_at ? (
+                        <span>📦 보관일: {formatDate(app.archived_at)}</span>
+                      ) : (
+                        <span>신청일: {formatDate(app.created_at)}</span>
+                      )}
+                    </div>
                   </div>
                   {getStatusBadge(app.status)}
                 </div>
@@ -495,71 +589,96 @@ function AdminPage() {
                 </div>
 
                 <div className="mt-4 space-y-3">
-                  {/* 약속 날짜/시간 입력 */}
-                  <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
-                    <label className="block text-sm font-semibold text-blue-800 mb-2">📅 약속 날짜/시간 설정</label>
-                    <div className="space-y-2">
-                      <input
-                        type="date"
-                        id={`date-${app.id}`}
-                        defaultValue={app.preferred_date || ''}
-                        className="w-full border-2 border-blue-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <input
-                        type="time"
-                        id={`time-${app.id}`}
-                        defaultValue={app.preferred_time || ''}
-                        className="w-full border-2 border-blue-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                      />
-                      <button
-                        onClick={() => {
-                          const date = document.getElementById(`date-${app.id}`).value;
-                          const time = document.getElementById(`time-${app.id}`).value;
-                          updateDateTime(app.id, date, time);
-                        }}
-                        className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition"
-                      >
-                        💾 약속 저장
-                      </button>
-                    </div>
-                    {(app.preferred_date || app.preferred_time) && (
-                      <div className="mt-2 pt-2 border-t border-blue-300">
-                        <span className="text-xs font-semibold text-blue-800">현재 약속:</span>
-                        <div className="text-sm text-blue-700 font-medium">
-                          {app.preferred_date || '-'} {app.preferred_time || ''}
-                        </div>
+                  {/* 약속 날짜/시간 입력 (일반 보기만) */}
+                  {!viewArchived && (
+                    <div className="bg-blue-50 p-3 rounded-lg border border-blue-200">
+                      <label className="block text-sm font-semibold text-blue-800 mb-2">📅 약속 날짜/시간 설정</label>
+                      <div className="space-y-2">
+                        <input
+                          type="date"
+                          id={`date-${app.id}`}
+                          defaultValue={app.preferred_date || ''}
+                          className="w-full border-2 border-blue-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <input
+                          type="time"
+                          id={`time-${app.id}`}
+                          defaultValue={app.preferred_time || ''}
+                          className="w-full border-2 border-blue-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        />
+                        <button
+                          onClick={() => {
+                            const date = document.getElementById(`date-${app.id}`).value;
+                            const time = document.getElementById(`time-${app.id}`).value;
+                            updateDateTime(app.id, date, time);
+                          }}
+                          className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg text-sm font-bold hover:bg-blue-700 transition"
+                        >
+                          💾 약속 저장
+                        </button>
                       </div>
-                    )}
-                  </div>
+                      {(app.preferred_date || app.preferred_time) && (
+                        <div className="mt-2 pt-2 border-t border-blue-300">
+                          <span className="text-xs font-semibold text-blue-800">현재 약속:</span>
+                          <div className="text-sm text-blue-700 font-medium">
+                            {app.preferred_date || '-'} {app.preferred_time || ''}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
 
-                  <label className="block text-sm font-semibold text-gray-700 mb-1">상태 변경</label>
-                  <select
-                    value={app.status}
-                    onChange={(e) => updateStatus(app.id, e.target.value)}
-                    className="w-full border-2 border-coway-blue rounded-lg px-4 py-3 text-base font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-coway-blue"
-                  >
-                    <option value="pending">대기중</option>
-                    <option value="confirmed">컨택완료</option>
-                    <option value="completed">완료</option>
-                    <option value="cancelled">취소</option>
-                  </select>
+                  {/* 보관함 보기 시 약속 정보만 표시 */}
+                  {viewArchived && (app.preferred_date || app.preferred_time) && (
+                    <div className="bg-gray-50 p-3 rounded-lg border border-gray-200">
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">📅 컨택 일시</label>
+                      <div className="text-sm text-gray-800">
+                        {app.preferred_date || '-'} {app.preferred_time || ''}
+                      </div>
+                    </div>
+                  )}
 
-                  <div className="flex gap-2">
-                    {app.status !== 'completed' && (
-                      <button
-                        onClick={() => updateStatus(app.id, 'completed')}
-                        className="flex-1 bg-green-500 text-white px-4 py-3 rounded-lg text-base font-bold hover:bg-green-600 transition"
+                  {!viewArchived && (
+                    <>
+                      <label className="block text-sm font-semibold text-gray-700 mb-1">상태 변경</label>
+                      <select
+                        value={app.status}
+                        onChange={(e) => updateStatus(app.id, e.target.value)}
+                        className="w-full border-2 border-coway-blue rounded-lg px-4 py-3 text-base font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-coway-blue"
                       >
-                        ✓ 완료 처리
-                      </button>
-                    )}
+                        <option value="pending">대기중</option>
+                        <option value="confirmed">컨택완료</option>
+                        <option value="completed">완료</option>
+                        <option value="cancelled">취소</option>
+                      </select>
+
+                      <div className="flex gap-2">
+                        {app.status !== 'completed' && (
+                          <button
+                            onClick={() => updateStatus(app.id, 'completed')}
+                            className="flex-1 bg-green-500 text-white px-4 py-3 rounded-lg text-base font-bold hover:bg-green-600 transition"
+                          >
+                            ✓ 완료 처리
+                          </button>
+                        )}
+                        <button
+                          onClick={() => deleteApplication(app.id, app.name)}
+                          className="flex-1 bg-red-500 text-white px-4 py-3 rounded-lg text-base font-bold hover:bg-red-600 transition"
+                        >
+                          🗑️ 삭제
+                        </button>
+                      </div>
+                    </>
+                  )}
+
+                  {viewArchived && (
                     <button
                       onClick={() => deleteApplication(app.id, app.name)}
-                      className="flex-1 bg-red-500 text-white px-4 py-3 rounded-lg text-base font-bold hover:bg-red-600 transition"
+                      className="w-full bg-red-500 text-white px-4 py-3 rounded-lg text-base font-bold hover:bg-red-600 transition"
                     >
-                      🗑️ 삭제
+                      🗑️삭제
                     </button>
-                  </div>
+                  )}
                 </div>
               </div>
             ))}
@@ -571,7 +690,7 @@ function AdminPage() {
               <thead className="bg-gray-50">
                 <tr>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    신청일
+                    {viewArchived ? '보관일' : '신청일'}
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     이름
@@ -585,18 +704,32 @@ function AdminPage() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     매트리스 정보
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    컨택일시
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    상태
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    상태 변경
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    케어 완료
-                  </th>
+                  {!viewArchived && (
+                    <>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        컨택일시
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        상태
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        상태 변경
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        케어 완료
+                      </th>
+                    </>
+                  )}
+                  {viewArchived && (
+                    <>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        컨택일시
+                      </th>
+                      <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                        상태
+                      </th>
+                    </>
+                  )}
                   <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
                     삭제
                   </th>
@@ -612,18 +745,18 @@ function AdminPage() {
                         : 'hover:bg-gray-50'
                     }`}
                   >
-                    {app.status === 'completed' && (
+                    {app.status === 'completed' && !viewArchived && (
                       <td className="absolute inset-0 pointer-events-none" colSpan="100" style={{
                         background: 'linear-gradient(to top right, transparent 0%, transparent calc(50% - 2px), rgba(0, 0, 0, 0.3) calc(50% - 2px), rgba(0, 0, 0, 0.3) calc(50% + 2px), transparent calc(50% + 2px), transparent 100%)'
                       }}></td>
                     )}
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {formatDate(app.created_at)}
+                      {viewArchived && app.archived_at ? formatDate(app.archived_at) : formatDate(app.created_at)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <div className="flex items-center gap-2">
                         <span>{app.name}</span>
-                        {app.preferred_date && app.preferred_time && (
+                        {app.preferred_date && app.preferred_time && !viewArchived && (
                           <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
                             ✓ 컨택완료
                           </span>
@@ -641,67 +774,92 @@ function AdminPage() {
                       <div>{app.mattress_type || '-'}</div>
                       <div className="text-xs text-gray-400">{app.mattress_age || '-'}</div>
                     </td>
-                    <td className="px-6 py-4 text-sm text-gray-700">
-                      <div className="space-y-2 min-w-[200px]">
-                        <input
-                          type="date"
-                          id={`desk-date-${app.id}`}
-                          defaultValue={app.preferred_date || ''}
-                          className="w-full border border-blue-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        />
-                        <input
-                          type="time"
-                          id={`desk-time-${app.id}`}
-                          defaultValue={app.preferred_time || ''}
-                          className="w-full border border-blue-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
-                        />
-                        <button
-                          onClick={() => {
-                            const date = document.getElementById(`desk-date-${app.id}`).value;
-                            const time = document.getElementById(`desk-time-${app.id}`).value;
-                            updateDateTime(app.id, date, time);
-                          }}
-                          className="w-full bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-blue-700 transition"
-                        >
-                          💾 저장
-                        </button>
-                        {(app.preferred_date || app.preferred_time) && (
-                          <div className="mt-1 pt-1 border-t border-blue-200">
-                            <span className="text-xs text-blue-600">현재:</span>
-                            <div className="text-xs text-blue-800 font-medium">
-                              {app.preferred_date || '-'} {app.preferred_time || ''}
+                    {!viewArchived && (
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        <div className="space-y-2 min-w-[200px]">
+                          <input
+                            type="date"
+                            id={`desk-date-${app.id}`}
+                            defaultValue={app.preferred_date || ''}
+                            className="w-full border border-blue-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                          <input
+                            type="time"
+                            id={`desk-time-${app.id}`}
+                            defaultValue={app.preferred_time || ''}
+                            className="w-full border border-blue-300 rounded px-2 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-blue-500"
+                          />
+                          <button
+                            onClick={() => {
+                              const date = document.getElementById(`desk-date-${app.id}`).value;
+                              const time = document.getElementById(`desk-time-${app.id}`).value;
+                              updateDateTime(app.id, date, time);
+                            }}
+                            className="w-full bg-blue-600 text-white px-2 py-1 rounded text-xs font-semibold hover:bg-blue-700 transition"
+                          >
+                            💾 저장
+                          </button>
+                          {(app.preferred_date || app.preferred_time) && (
+                            <div className="mt-1 pt-1 border-t border-blue-200">
+                              <span className="text-xs text-blue-600">현재:</span>
+                              <div className="text-xs text-blue-800 font-medium">
+                                {app.preferred_date || '-'} {app.preferred_time || ''}
+                              </div>
                             </div>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      {getStatusBadge(app.status)}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      <select
-                        value={app.status}
-                        onChange={(e) => updateStatus(app.id, e.target.value)}
-                        className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-coway-blue"
-                      >
-                        <option value="pending">대기중</option>
-                        <option value="confirmed">컨택완료</option>
-                        <option value="completed">완료</option>
-                        <option value="cancelled">취소</option>
-                      </select>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm">
-                      {app.status !== 'completed' ? (
-                        <button
-                          onClick={() => updateStatus(app.id, 'completed')}
-                          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition font-semibold"
-                        >
-                          ✓ 완료 처리
-                        </button>
-                      ) : (
-                        <span className="text-green-600 font-semibold">✓ 완료됨</span>
-                      )}
-                    </td>
+                          )}
+                        </div>
+                      </td>
+                    )}
+                    {viewArchived && (
+                      <td className="px-6 py-4 text-sm text-gray-700">
+                        <div className="text-xs">
+                          {app.preferred_date && app.preferred_time ? (
+                            <>
+                              <div>{app.preferred_date}</div>
+                              <div>{app.preferred_time}</div>
+                            </>
+                          ) : (
+                            <span className="text-gray-400">-</span>
+                          )}
+                        </div>
+                      </td>
+                    )}
+                    {!viewArchived && (
+                      <>
+                        <td className="px-6 py-4 whitespace-nowrap">
+                          {getStatusBadge(app.status)}
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          <select
+                            value={app.status}
+                            onChange={(e) => updateStatus(app.id, e.target.value)}
+                            className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-coway-blue"
+                          >
+                            <option value="pending">대기중</option>
+                            <option value="confirmed">컨택완료</option>
+                            <option value="completed">완료</option>
+                            <option value="cancelled">취소</option>
+                          </select>
+                        </td>
+                        <td className="px-6 py-4 whitespace-nowrap text-sm">
+                          {app.status !== 'completed' ? (
+                            <button
+                              onClick={() => updateStatus(app.id, 'completed')}
+                              className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition font-semibold"
+                            >
+                              ✓ 완료 처리
+                            </button>
+                          ) : (
+                            <span className="text-green-600 font-semibold">✓ 완료됨</span>
+                          )}
+                        </td>
+                      </>
+                    )}
+                    {viewArchived && (
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        {getStatusBadge(app.status)}
+                      </td>
+                    )}
                     <td className="px-6 py-4 whitespace-nowrap text-center">
                       <button
                         onClick={() => deleteApplication(app.id, app.name)}

@@ -237,6 +237,62 @@ export default async function handler(req, res) {
       });
     }
 
+    // 3-2. 완료 항목 보관 (이동)
+    if (path === '/applications/archive' && method === 'POST') {
+      // 완료 상태인 모든 항목 가져오기
+      const completedSnapshot = await db.collection('applications')
+        .where('status', '==', 'completed')
+        .get();
+
+      if (completedSnapshot.empty) {
+        return res.json({
+          success: true,
+          message: '보관할 완료 항목이 없습니다.',
+          archivedCount: 0
+        });
+      }
+
+      const batch = db.batch();
+      let count = 0;
+
+      // archived_applications로 복사 및 원본 삭제
+      for (const doc of completedSnapshot.docs) {
+        const data = doc.data();
+        // 보관 컬렉션에 추가
+        const archivedRef = db.collection('archived_applications').doc(doc.id);
+        batch.set(archivedRef, {
+          ...data,
+          archived_at: admin.firestore.FieldValue.serverTimestamp()
+        });
+        // 원본 삭제
+        batch.delete(doc.ref);
+        count++;
+      }
+
+      await batch.commit();
+
+      return res.json({
+        success: true,
+        message: `${count}건의 완료 항목을 보관했습니다.`,
+        archivedCount: count
+      });
+    }
+
+    // 3-3. 보관된 항목 조회
+    if (path === '/archived-applications' && method === 'GET') {
+      const snapshot = await db.collection('archived_applications').get();
+      const archivedApps = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        created_at: doc.data().created_at?.toDate().toISOString(),
+        archived_at: doc.data().archived_at?.toDate().toISOString()
+      }))
+      // 보관 날짜 기준 최신순
+      .sort((a, b) => new Date(b.archived_at) - new Date(a.archived_at));
+
+      return res.json({ success: true, applications: archivedApps });
+    }
+
     // 4. 제품 목록 조회
     if (path === '/products' && method === 'GET') {
       const snapshot = await db.collection('products').get();
