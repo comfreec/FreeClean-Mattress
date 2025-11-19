@@ -166,8 +166,11 @@ function AdminPage() {
 
   const updateStatus = async (id, newStatus) => {
     try {
+      // 취소를 선택하면 대기중으로 변경
+      const actualStatus = newStatus === 'cancelled' ? 'pending' : newStatus;
+
       const response = await api.patch(`/api/applications/${id}`, {
-        status: newStatus
+        status: actualStatus
       });
 
       if (response.data.success) {
