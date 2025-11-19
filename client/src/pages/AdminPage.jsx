@@ -100,6 +100,16 @@ function AdminPage() {
           filteredApps = filteredApps.filter(app => app.status === filter);
         }
 
+        // 정렬: 완료건은 뒤로, 나머지는 최신순
+        filteredApps.sort((a, b) => {
+          // 완료 상태는 뒤로
+          if (a.status === 'completed' && b.status !== 'completed') return 1;
+          if (a.status !== 'completed' && b.status === 'completed') return -1;
+
+          // 같은 상태 그룹 내에서는 최신순
+          return new Date(b.created_at) - new Date(a.created_at);
+        });
+
         setApplications(filteredApps);
 
         // 전체 데이터로 통계 계산
