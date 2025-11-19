@@ -673,7 +673,6 @@ function AdminPage() {
                         className="w-full border-2 border-coway-blue rounded-lg px-4 py-3 text-base font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-coway-blue"
                       >
                         <option value="pending">대기중</option>
-                        <option value="confirmed">컨택완료</option>
                         <option value="completed">완료</option>
                         <option value="cancelled">취소</option>
                       </select>
@@ -870,7 +869,6 @@ function AdminPage() {
                             className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-coway-blue"
                           >
                             <option value="pending">대기중</option>
-                            <option value="confirmed">컨택완료</option>
                             <option value="completed">완료</option>
                             <option value="cancelled">취소</option>
                           </select>
