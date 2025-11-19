@@ -1,5 +1,7 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
+import { db } from '../firebase';
+import { collection, onSnapshot, query, doc, setDoc, deleteDoc, serverTimestamp, where, orderBy } from 'firebase/firestore';
 
 // Axios 인스턴스 생성 - Vercel 배포 환경에서도 작동하도록
 const api = axios.create({
@@ -21,6 +23,9 @@ function AdminPage() {
   const [activeTab, setActiveTab] = useState('applications'); // 'applications' or 'posts'
   const [viewArchived, setViewArchived] = useState(false); // 보관함 보기
   const [loading, setLoading] = useState(true);
+  const [activeSessions, setActiveSessions] = useState([]); // 접속 중인 관리자
+  const sessionIdRef = useRef(null);
+  const heartbeatIntervalRef = useRef(null);
 
   // 페이지 로드 시 인증 상태 확인
   useEffect(() => {
@@ -33,16 +38,97 @@ function AdminPage() {
     }
   }, []);
 
-  // 인증된 경우에만 데이터 로드
+  // 실시간 데이터 동기화
   useEffect(() => {
-    if (isAuthenticated) {
-      if (activeTab === 'applications') {
-        fetchData();
-      } else {
-        fetchPosts();
-      }
+    if (!isAuthenticated || activeTab !== 'applications' || viewArchived) {
+      return;
     }
-  }, [filter, searchDate, isAuthenticated, activeTab, viewArchived]);
+
+    setLoading(true);
+
+    // applications 컬렉션 실시간 리스너
+    const applicationsQuery = query(
+      collection(db, 'applications'),
+      orderBy('created_at', 'desc')
+    );
+
+    const unsubscribe = onSnapshot(applicationsQuery, (snapshot) => {
+      try {
+        const allApps = snapshot.docs.map(doc => ({
+          id: doc.id,
+          ...doc.data(),
+          created_at: doc.data().created_at?.toDate().toISOString()
+        }));
+
+        // 클라이언트 측에서 필터링
+        let filteredApps = allApps;
+
+        // 날짜 검색
+        if (searchDate) {
+          filteredApps = filteredApps.filter(app => {
+            if (!app.preferred_date) return false;
+            if (app.status === 'completed') return false;
+            return app.preferred_date === searchDate;
+          });
+        }
+        // 상태 필터링
+        else if (filter === 'confirmed') {
+          filteredApps = filteredApps.filter(app => {
+            return app.preferred_date && app.preferred_time && app.status !== 'completed';
+          });
+        }
+        else if (filter === 'pending') {
+          filteredApps = filteredApps.filter(app => {
+            return app.status === 'pending' && (!app.preferred_date || !app.preferred_time);
+          });
+        }
+        else if (filter !== 'all') {
+          filteredApps = filteredApps.filter(app => app.status === filter);
+        }
+
+        // 정렬: 완료건은 뒤로, 나머지는 최신순
+        filteredApps.sort((a, b) => {
+          if (a.status === 'completed' && b.status !== 'completed') return 1;
+          if (a.status !== 'completed' && b.status === 'completed') return -1;
+          return new Date(b.created_at) - new Date(a.created_at);
+        });
+
+        setApplications(filteredApps);
+
+        // 통계 계산
+        const calculatedStats = {
+          totalApplications: allApps.length,
+          pendingApplications: allApps.filter(a => a.status === 'pending' && (!a.preferred_date || !a.preferred_time)).length,
+          confirmedApplications: allApps.filter(a => a.preferred_date && a.preferred_time && a.status !== 'completed').length,
+          completedApplications: allApps.filter(a => a.status === 'completed').length,
+          contactedApplications: allApps.filter(a => a.preferred_date && a.preferred_time).length,
+          totalReviews: 0
+        };
+        setStats(calculatedStats);
+        setLoading(false);
+      } catch (error) {
+        console.error('데이터 처리 실패:', error);
+        setLoading(false);
+      }
+    }, (error) => {
+      console.error('실시간 리스너 오류:', error);
+      alert('데이터 동기화 중 오류가 발생했습니다.');
+      setLoading(false);
+    });
+
+    return () => unsubscribe();
+  }, [isAuthenticated, activeTab, viewArchived, filter, searchDate]);
+
+  // 보관함 또는 후기 탭 데이터 로드
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    if (viewArchived && activeTab === 'applications') {
+      fetchArchivedData();
+    } else if (activeTab === 'posts') {
+      fetchPosts();
+    }
+  }, [isAuthenticated, activeTab, viewArchived]);
 
   const handleLogin = (e) => {
     e.preventDefault();
@@ -57,10 +143,104 @@ function AdminPage() {
   };
 
   const handleLogout = () => {
+    // 세션 정리
+    if (sessionIdRef.current) {
+      deleteDoc(doc(db, 'admin_sessions', sessionIdRef.current)).catch(err =>
+        console.error('세션 삭제 실패:', err)
+      );
+    }
+    if (heartbeatIntervalRef.current) {
+      clearInterval(heartbeatIntervalRef.current);
+    }
+
     setIsAuthenticated(false);
     sessionStorage.removeItem('adminAuth');
     setPassword('');
   };
+
+  // 브라우저 정보 가져오기
+  const getBrowserInfo = () => {
+    const ua = navigator.userAgent;
+    let browser = "Unknown";
+    if (ua.indexOf("Chrome") > -1) browser = "Chrome";
+    else if (ua.indexOf("Safari") > -1) browser = "Safari";
+    else if (ua.indexOf("Firefox") > -1) browser = "Firefox";
+    else if (ua.indexOf("Edge") > -1) browser = "Edge";
+
+    const isMobile = /Mobile|Android|iPhone|iPad/i.test(ua);
+    return `${browser} ${isMobile ? '📱' : '💻'}`;
+  };
+
+  // 관리자 세션 생성
+  const createAdminSession = async () => {
+    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+    sessionIdRef.current = sessionId;
+
+    try {
+      await setDoc(doc(db, 'admin_sessions', sessionId), {
+        browser: getBrowserInfo(),
+        loginTime: serverTimestamp(),
+        lastActive: serverTimestamp()
+      });
+
+      // 30초마다 heartbeat 업데이트
+      heartbeatIntervalRef.current = setInterval(async () => {
+        if (sessionIdRef.current) {
+          try {
+            await setDoc(doc(db, 'admin_sessions', sessionIdRef.current), {
+              lastActive: serverTimestamp()
+            }, { merge: true });
+          } catch (err) {
+            console.error('Heartbeat 실패:', err);
+          }
+        }
+      }, 30000);
+    } catch (err) {
+      console.error('세션 생성 실패:', err);
+    }
+  };
+
+  // 접속 중인 관리자 실시간 감시
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
+    // 세션 생성
+    createAdminSession();
+
+    // 접속자 실시간 리스너
+    const sessionsQuery = query(collection(db, 'admin_sessions'));
+    const unsubscribeSessions = onSnapshot(sessionsQuery, (snapshot) => {
+      const sessions = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        loginTime: doc.data().loginTime?.toDate(),
+        lastActive: doc.data().lastActive?.toDate()
+      }));
+      setActiveSessions(sessions);
+    });
+
+    // 페이지 닫을 때 세션 삭제
+    const handleBeforeUnload = () => {
+      if (sessionIdRef.current) {
+        // Beacon API로 비동기 전송
+        navigator.sendBeacon(`/api/delete-session/${sessionIdRef.current}`);
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      unsubscribeSessions();
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+      if (sessionIdRef.current) {
+        deleteDoc(doc(db, 'admin_sessions', sessionIdRef.current)).catch(err =>
+          console.error('세션 삭제 실패:', err)
+        );
+      }
+      if (heartbeatIntervalRef.current) {
+        clearInterval(heartbeatIntervalRef.current);
+      }
+    };
+  }, [isAuthenticated]);
 
   const fetchArchivedData = async () => {
     setLoading(true);
@@ -379,7 +559,7 @@ function AdminPage() {
   return (
     <div className="py-8 bg-gray-50 min-h-screen">
       <div className="container mx-auto px-4">
-        <div className="flex justify-between items-center mb-8">
+        <div className="flex justify-between items-center mb-4">
           <h1 className="text-4xl font-bold">관리자 대시보드</h1>
           <button
             onClick={handleLogout}
@@ -388,6 +568,39 @@ function AdminPage() {
             로그아웃
           </button>
         </div>
+
+        {/* 접속 중인 관리자 표시 */}
+        {activeSessions.length > 0 && (
+          <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-8">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+              <h3 className="font-bold text-green-800">
+                현재 접속 중: {activeSessions.length}명
+              </h3>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {activeSessions.map((session, idx) => (
+                <div
+                  key={session.id}
+                  className={`px-3 py-1 rounded-full text-sm font-medium ${
+                    session.id === sessionIdRef.current
+                      ? 'bg-blue-500 text-white'
+                      : 'bg-green-100 text-green-800'
+                  }`}
+                >
+                  {session.browser}
+                  {session.id === sessionIdRef.current && ' (나)'}
+                  <span className="ml-1 text-xs opacity-75">
+                    {session.loginTime?.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-green-700 mt-2">
+              💡 실시간 동기화 활성화 - 다른 관리자의 변경사항이 자동 반영됩니다
+            </p>
+          </div>
+        )}
 
         {/* 탭 버튼 */}
         <div className="bg-white p-4 rounded-lg shadow mb-8">
