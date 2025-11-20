@@ -746,33 +746,33 @@ function AdminPage() {
           <div className="flex space-x-2">
             <button
               onClick={() => setActiveTab('applications')}
-              className={`px-6 py-3 rounded-lg font-semibold transition ${
+              className={`px-3 md:px-6 py-3 rounded-lg font-semibold transition text-sm md:text-base ${
                 activeTab === 'applications'
                   ? 'bg-coway-blue text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              📋 신청 관리
+              📋 <span className="hidden sm:inline">신청 </span>관리
             </button>
             <button
               onClick={() => setActiveTab('posts')}
-              className={`px-6 py-3 rounded-lg font-semibold transition ${
+              className={`px-3 md:px-6 py-3 rounded-lg font-semibold transition text-sm md:text-base ${
                 activeTab === 'posts'
                   ? 'bg-coway-blue text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              ⭐ 후기 관리
+              ⭐ <span className="hidden sm:inline">후기 </span>관리
             </button>
             <button
               onClick={() => setActiveTab('settings')}
-              className={`px-6 py-3 rounded-lg font-semibold transition ${
+              className={`px-3 md:px-6 py-3 rounded-lg font-semibold transition text-sm md:text-base ${
                 activeTab === 'settings'
                   ? 'bg-coway-blue text-white'
                   : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
               }`}
             >
-              ⚙️ 환경설정
+              ⚙️ 설정
             </button>
           </div>
         </div>
