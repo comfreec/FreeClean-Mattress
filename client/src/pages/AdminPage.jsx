@@ -676,17 +676,17 @@ function AdminPage() {
               </div>
             </div>
           </div>
-
-          {/* 통계 보기 버튼 */}
-          <div className="mb-6">
-            <button
-              onClick={() => setShowStats(true)}
-              className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center gap-2"
-            >
-              📊 월별 통계 보기
-            </button>
-          </div>
         )}
+
+        {/* 통계 보기 버튼 */}
+        <div className="mb-6">
+          <button
+            onClick={() => setShowStats(true)}
+            className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center gap-2"
+          >
+            📊 월별 통계 보기
+          </button>
+        </div>
 
         {/* 필터 버튼 */}
         <div className="bg-white p-4 rounded-lg shadow mb-6">
