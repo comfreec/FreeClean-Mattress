@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import { db, isFirebaseConfigured } from '../firebase';
 import { collection, onSnapshot, query, doc, setDoc, deleteDoc, serverTimestamp, where, orderBy } from 'firebase/firestore';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 
 // Axios 인스턴스 생성 - Vercel 배포 환경에서도 작동하도록
 const api = axios.create({
@@ -24,6 +25,8 @@ function AdminPage() {
   const [viewArchived, setViewArchived] = useState(false); // 보관함 보기
   const [loading, setLoading] = useState(true);
   const [activeSessions, setActiveSessions] = useState([]); // 접속 중인 관리자
+  const [showStats, setShowStats] = useState(false); // 통계 모달
+  const [allApplicationsData, setAllApplicationsData] = useState([]); // 전체 데이터 (통계용)
   const sessionIdRef = useRef(null);
   const heartbeatIntervalRef = useRef(null);
 
@@ -102,6 +105,9 @@ function AdminPage() {
 
   // 데이터 처리 공통 함수
   const processAndSetApplications = (allApps) => {
+    // 전체 데이터 저장 (통계용)
+    setAllApplicationsData(allApps);
+
     // 클라이언트 측에서 필터링
     let filteredApps = allApps;
 
@@ -489,6 +495,36 @@ function AdminPage() {
     });
   };
 
+  // 월별 완료건 통계 계산
+  const getMonthlyStats = () => {
+    const monthlyData = {};
+
+    // 최근 12개월 초기화
+    for (let i = 11; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+      monthlyData[key] = { month: `${date.getMonth() + 1}월`, completed: 0, total: 0 };
+    }
+
+    // 완료건 집계
+    allApplicationsData.forEach(app => {
+      if (app.created_at) {
+        const date = new Date(app.created_at);
+        const key = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
+
+        if (monthlyData[key]) {
+          monthlyData[key].total += 1;
+          if (app.status === 'completed') {
+            monthlyData[key].completed += 1;
+          }
+        }
+      }
+    });
+
+    return Object.values(monthlyData);
+  };
+
   // 로그인 페이지
   if (!isAuthenticated) {
     return (
@@ -639,6 +675,16 @@ function AdminPage() {
                 {stats.completedApplications}
               </div>
             </div>
+          </div>
+
+          {/* 통계 보기 버튼 */}
+          <div className="mb-6">
+            <button
+              onClick={() => setShowStats(true)}
+              className="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-indigo-700 transition flex items-center gap-2"
+            >
+              📊 월별 통계 보기
+            </button>
           </div>
         )}
 
@@ -1133,6 +1179,61 @@ function AdminPage() {
           )}
         </div>
           </>
+        )}
+
+        {/* 통계 모달 */}
+        {showStats && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <div className="bg-white rounded-lg shadow-xl w-full max-w-4xl max-h-[90vh] overflow-auto">
+              <div className="p-6">
+                <div className="flex justify-between items-center mb-6">
+                  <h2 className="text-2xl font-bold text-gray-900">📊 월별 완료건 통계</h2>
+                  <button
+                    onClick={() => setShowStats(false)}
+                    className="text-gray-500 hover:text-gray-700 text-2xl font-bold"
+                  >
+                    ✕
+                  </button>
+                </div>
+
+                <div className="h-80 mb-6">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart data={getMonthlyStats()} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip
+                        formatter={(value, name) => [value, name === 'completed' ? '완료' : '전체']}
+                        labelFormatter={(label) => `${label}`}
+                      />
+                      <Bar dataKey="completed" fill="#10B981" name="완료" radius={[4, 4, 0, 0]} />
+                      <Bar dataKey="total" fill="#3B82F6" name="전체" radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+
+                <div className="flex justify-center gap-6 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-green-500 rounded"></div>
+                    <span>완료건</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-4 h-4 bg-blue-500 rounded"></div>
+                    <span>전체 신청</span>
+                  </div>
+                </div>
+
+                <div className="mt-6 text-center">
+                  <button
+                    onClick={() => setShowStats(false)}
+                    className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
+                  >
+                    닫기
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
         )}
 
         {/* 후기 관리 탭 */}
