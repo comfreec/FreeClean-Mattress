@@ -1763,9 +1763,9 @@ function AdminPage() {
               {/* 미리보기 */}
               <div className="mt-8 border-t pt-6">
                 <h3 className="text-lg font-bold text-gray-800 mb-4">📱 미리보기</h3>
-                <div className="bg-gray-900 text-white p-6 rounded-lg text-center">
+                <div className="bg-gradient-to-br from-blue-600 to-blue-900 text-white p-6 rounded-lg text-center">
                   {customPrefixInput && (
-                    <div className="text-xl md:text-2xl font-bold mb-3 bg-gradient-to-r from-green-300 to-cyan-300 bg-clip-text text-transparent">
+                    <div className="text-xl md:text-2xl font-bold mb-6 text-white">
                       {customPrefixInput}
                     </div>
                   )}

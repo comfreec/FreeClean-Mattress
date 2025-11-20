@@ -66,8 +66,8 @@ function HomePage() {
           </div>
 
           {customPrefix && (
-            <div className="text-white text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-3 md:mb-4 px-2 drop-shadow-lg">
-              <span className="bg-gradient-to-r from-green-300 to-cyan-300 bg-clip-text text-transparent">
+            <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 md:mb-8 px-2">
+              <span className="text-white drop-shadow-lg">
                 {customPrefix}
               </span>
             </div>
