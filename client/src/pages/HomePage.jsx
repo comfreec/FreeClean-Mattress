@@ -66,44 +66,32 @@ function HomePage() {
           </div>
 
           {customPrefix && (
-            <div className="overflow-hidden mb-6 md:mb-8 px-2">
-              <div
-                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold"
+            <div className="mb-6 md:mb-8 px-2">
+              <span
+                className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold shimmer-text"
                 style={{
-                  animation: 'marqueeSlide 8s linear infinite'
+                  background: 'linear-gradient(90deg, #ffffff 0%, #ffffff 40%, #ffd700 50%, #ffffff 60%, #ffffff 100%)',
+                  backgroundSize: '200% 100%',
+                  WebkitBackgroundClip: 'text',
+                  backgroundClip: 'text',
+                  WebkitTextFillColor: 'transparent',
+                  animation: 'shimmer 3s ease-in-out infinite',
+                  textShadow: 'none'
                 }}
               >
-                <span className="text-white" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3)' }}>
-                  {customPrefix}
-                </span>
-              </div>
+                {customPrefix}
+              </span>
             </div>
           )}
 
-          {/* 마키 슬라이드 애니메이션 CSS */}
+          {/* 반짝이는 shimmer 애니메이션 CSS */}
           <style>{`
-            @keyframes marqueeSlide {
+            @keyframes shimmer {
               0% {
-                opacity: 0;
-                transform: translateX(-100%);
-              }
-              10% {
-                opacity: 1;
-              }
-              45% {
-                opacity: 1;
-                transform: translateX(0);
-              }
-              55% {
-                opacity: 1;
-                transform: translateX(0);
-              }
-              90% {
-                opacity: 1;
+                background-position: 200% center;
               }
               100% {
-                opacity: 0;
-                transform: translateX(100%);
+                background-position: -200% center;
               }
             }
           `}</style>
