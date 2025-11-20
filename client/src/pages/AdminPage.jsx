@@ -31,6 +31,7 @@ function AdminPage() {
   const [sortBy, setSortBy] = useState('date'); // 정렬 기준
   const [showCalendar, setShowCalendar] = useState(false); // 캘린더 모달
   const [selectedMonth, setSelectedMonth] = useState(new Date()); // 선택된 월
+  const [selectedDate, setSelectedDate] = useState(null); // 선택된 날짜
   const sessionIdRef = useRef(null);
   const heartbeatIntervalRef = useRef(null);
   const prevCountRef = useRef(0); // 이전 신청 수 (알림음용)
@@ -1393,7 +1394,10 @@ function AdminPage() {
                 {/* 월 선택 */}
                 <div className="flex items-center justify-center gap-4 mb-6">
                   <button
-                    onClick={() => setSelectedMonth(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() - 1))}
+                    onClick={() => {
+                      setSelectedMonth(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() - 1));
+                      setSelectedDate(null);
+                    }}
                     className="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition font-bold"
                   >
                     ◀ 이전
@@ -1402,7 +1406,10 @@ function AdminPage() {
                     {selectedMonth.getFullYear()}년 {selectedMonth.getMonth() + 1}월
                   </span>
                   <button
-                    onClick={() => setSelectedMonth(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1))}
+                    onClick={() => {
+                      setSelectedMonth(new Date(selectedMonth.getFullYear(), selectedMonth.getMonth() + 1));
+                      setSelectedDate(null);
+                    }}
                     className="bg-gray-200 px-4 py-2 rounded-lg hover:bg-gray-300 transition font-bold"
                   >
                     다음 ▶
@@ -1439,7 +1446,17 @@ function AdminPage() {
                       );
 
                       cells.push(
-                        <div key={day} className={`h-10 md:h-20 border rounded p-1 text-xs overflow-hidden ${appointments.length > 0 ? 'bg-blue-50 border-blue-300' : 'bg-gray-50'}`}>
+                        <div
+                          key={day}
+                          onClick={() => setSelectedDate(dateStr)}
+                          className={`h-10 md:h-20 border rounded p-1 text-xs overflow-hidden cursor-pointer transition hover:bg-blue-100 ${
+                            selectedDate === dateStr
+                              ? 'bg-blue-200 border-blue-500 ring-2 ring-blue-500'
+                              : appointments.length > 0
+                                ? 'bg-blue-50 border-blue-300'
+                                : 'bg-gray-50'
+                          }`}
+                        >
                           <div className={`font-bold text-xs md:text-sm ${new Date(year, month, day).getDay() === 0 ? 'text-red-500' : new Date(year, month, day).getDay() === 6 ? 'text-blue-500' : ''}`}>
                             {day}
                           </div>
@@ -1468,15 +1485,34 @@ function AdminPage() {
                   })()}
                 </div>
 
-                {/* 모바일용 일정 목록 */}
-                <div className="block md:hidden mt-4 border-t pt-4">
-                  <h3 className="font-bold text-lg mb-3">📋 이번 달 일정</h3>
+                {/* 일정 목록 (모바일 + 데스크톱) */}
+                <div className="mt-4 border-t pt-4">
+                  <div className="flex justify-between items-center mb-3">
+                    <h3 className="font-bold text-lg">
+                      {selectedDate ? `📋 ${selectedDate} 일정` : '📋 이번 달 일정'}
+                    </h3>
+                    {selectedDate && (
+                      <button
+                        onClick={() => setSelectedDate(null)}
+                        className="text-sm bg-gray-200 px-3 py-1 rounded hover:bg-gray-300"
+                      >
+                        전체보기
+                      </button>
+                    )}
+                  </div>
                   {(() => {
                     const year = selectedMonth.getFullYear();
                     const month = selectedMonth.getMonth();
-                    const monthApps = allApplicationsData
+                    const filteredApps = allApplicationsData
                       .filter(app => {
                         if (!app.preferred_date || app.status === 'completed') return false;
+
+                        // 선택된 날짜가 있으면 해당 날짜만
+                        if (selectedDate) {
+                          return app.preferred_date === selectedDate;
+                        }
+
+                        // 없으면 해당 월 전체
                         const appDate = new Date(app.preferred_date);
                         return appDate.getFullYear() === year && appDate.getMonth() === month;
                       })
@@ -1487,14 +1523,14 @@ function AdminPage() {
                         return (a.preferred_time || '').localeCompare(b.preferred_time || '');
                       });
 
-                    if (monthApps.length === 0) {
+                    if (filteredApps.length === 0) {
                       return <div className="text-gray-500 text-center py-4">예정된 일정이 없습니다</div>;
                     }
 
-                    return monthApps.map((app, idx) => (
+                    return filteredApps.map((app, idx) => (
                       <div key={idx} className="bg-blue-50 border border-blue-200 rounded-lg p-3 mb-2">
                         <div className="font-bold text-blue-800">
-                          {app.preferred_date} {app.preferred_time}
+                          {app.preferred_date} &nbsp;&nbsp; {app.preferred_time}
                         </div>
                         <div className="text-gray-800">{app.name} - {app.phone}</div>
                         <div className="text-gray-600 text-sm truncate">{app.address}</div>
