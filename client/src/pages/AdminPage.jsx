@@ -110,14 +110,16 @@ function AdminPage() {
     }
   }, [isAuthenticated, activeTab, viewArchived, filter, searchDate, searchQuery, sortBy]);
 
-  // 검색어 디바운스 (500ms 후 실제 검색)
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setSearchQuery(searchInput);
-    }, 500);
+  // 검색 실행
+  const handleSearch = () => {
+    setSearchQuery(searchInput);
+  };
 
-    return () => clearTimeout(timer);
-  }, [searchInput]);
+  // 검색 초기화
+  const clearSearch = () => {
+    setSearchInput('');
+    setSearchQuery('');
+  };
 
   // 데이터 처리 공통 함수
   const processAndSetApplications = (allApps) => {
@@ -771,13 +773,30 @@ function AdminPage() {
             {/* 검색 */}
             <div className="flex-1">
               <label className="block text-sm font-semibold text-gray-700 mb-1">🔍 고객 검색</label>
-              <input
-                type="text"
-                value={searchInput}
-                onChange={(e) => setSearchInput(e.target.value)}
-                placeholder="이름, 전화번호, 주소로 검색..."
-                className="w-full border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-coway-blue"
-              />
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={searchInput}
+                  onChange={(e) => setSearchInput(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+                  placeholder="이름, 전화번호, 주소로 검색..."
+                  className="flex-1 border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-coway-blue"
+                />
+                <button
+                  onClick={handleSearch}
+                  className="bg-coway-blue text-white px-4 py-2 rounded-lg font-semibold hover:bg-coway-navy transition whitespace-nowrap"
+                >
+                  찾기
+                </button>
+                {searchQuery && (
+                  <button
+                    onClick={clearSearch}
+                    className="bg-gray-500 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-600 transition whitespace-nowrap"
+                  >
+                    초기화
+                  </button>
+                )}
+              </div>
             </div>
             {/* 정렬 */}
             <div className="md:w-48">
