@@ -67,7 +67,7 @@ function HomePage() {
 
           {customPrefix && (
             <div className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold mb-6 md:mb-8 px-2">
-              <span className="text-white drop-shadow-lg">
+              <span className="text-white" style={{ textShadow: '2px 2px 8px rgba(0,0,0,0.5), 0 0 20px rgba(255,255,255,0.3)' }}>
                 {customPrefix}
               </span>
             </div>
