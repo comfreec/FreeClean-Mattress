@@ -811,9 +811,9 @@ function AdminPage() {
             {/* 상태 필터 */}
             <div className="flex flex-wrap items-center gap-2">
               <button
-                onClick={() => setFilter('all')}
+                onClick={() => { setFilter('all'); clearSearch(); }}
                 className={`px-4 py-2 rounded ${
-                  filter === 'all'
+                  filter === 'all' && !searchQuery
                     ? 'bg-coway-blue text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
@@ -821,9 +821,9 @@ function AdminPage() {
                 전체
               </button>
               <button
-                onClick={() => setFilter('pending')}
+                onClick={() => { setFilter('pending'); clearSearch(); }}
                 className={`px-4 py-2 rounded ${
-                  filter === 'pending'
+                  filter === 'pending' && !searchQuery
                     ? 'bg-coway-blue text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
@@ -831,9 +831,9 @@ function AdminPage() {
                 대기중
               </button>
               <button
-                onClick={() => setFilter('confirmed')}
+                onClick={() => { setFilter('confirmed'); clearSearch(); }}
                 className={`px-4 py-2 rounded ${
-                  filter === 'confirmed'
+                  filter === 'confirmed' && !searchQuery
                     ? 'bg-coway-blue text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
@@ -841,9 +841,9 @@ function AdminPage() {
                 컨택완료
               </button>
               <button
-                onClick={() => setFilter('completed')}
+                onClick={() => { setFilter('completed'); clearSearch(); }}
                 className={`px-4 py-2 rounded ${
-                  filter === 'completed'
+                  filter === 'completed' && !searchQuery
                     ? 'bg-coway-blue text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
