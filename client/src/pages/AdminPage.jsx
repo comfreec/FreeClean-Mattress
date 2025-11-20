@@ -970,14 +970,14 @@ function AdminPage() {
           </div>
 
           {/* 모바일 카드 뷰 */}
-          <div className="block md:hidden">
+          <div className="block md:hidden p-3 space-y-3">
             {applications.map((app) => (
               <div
                 key={app.id}
-                className={`border-b-2 border-gray-800 p-4 relative ${
+                className={`border-2 rounded-lg p-4 relative shadow-sm ${
                   app.status === 'completed'
-                    ? 'bg-gray-50 hover:bg-gray-100'
-                    : 'hover:bg-gray-50'
+                    ? 'bg-gray-50 border-gray-400'
+                    : 'bg-white border-blue-400'
                 }`}
               >
                 {app.status === 'completed' && (
