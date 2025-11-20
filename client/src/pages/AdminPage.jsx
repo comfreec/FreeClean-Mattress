@@ -28,6 +28,7 @@ function AdminPage() {
   const [showStats, setShowStats] = useState(false); // 통계 모달
   const [allApplicationsData, setAllApplicationsData] = useState([]); // 전체 데이터 (통계용)
   const [searchQuery, setSearchQuery] = useState(''); // 검색어
+  const [searchInput, setSearchInput] = useState(''); // 검색 입력값 (디바운스용)
   const [sortBy, setSortBy] = useState('date'); // 정렬 기준
   const [showCalendar, setShowCalendar] = useState(false); // 캘린더 모달
   const [selectedMonth, setSelectedMonth] = useState(new Date()); // 선택된 월
@@ -108,6 +109,15 @@ function AdminPage() {
       fetchData();
     }
   }, [isAuthenticated, activeTab, viewArchived, filter, searchDate, searchQuery, sortBy]);
+
+  // 검색어 디바운스 (500ms 후 실제 검색)
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchQuery(searchInput);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchInput]);
 
   // 데이터 처리 공통 함수
   const processAndSetApplications = (allApps) => {
@@ -763,8 +773,8 @@ function AdminPage() {
               <label className="block text-sm font-semibold text-gray-700 mb-1">🔍 고객 검색</label>
               <input
                 type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                value={searchInput}
+                onChange={(e) => setSearchInput(e.target.value)}
                 placeholder="이름, 전화번호, 주소로 검색..."
                 className="w-full border-2 border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-coway-blue"
               />
