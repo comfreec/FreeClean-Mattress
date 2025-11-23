@@ -621,7 +621,7 @@ function HomePage() {
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-bold text-white truncate">
-                {socialProofData[currentNotificationIndex]?.name}님이 신청했습니다
+                {socialProofData[currentNotificationIndex]?.name?.charAt(0)}**님이 신청했습니다
               </p>
               <p className="text-xs text-yellow-300 font-semibold">
                 {socialProofData[currentNotificationIndex]?.time}
