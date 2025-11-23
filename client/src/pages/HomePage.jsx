@@ -5,6 +5,32 @@ import axios from 'axios';
 function HomePage() {
   const [openFaq, setOpenFaq] = useState(null);
   const [customPrefix, setCustomPrefix] = useState('');
+  const [showNotification, setShowNotification] = useState(false);
+  const [currentNotificationIndex, setCurrentNotificationIndex] = useState(0);
+
+  // Social Proof 가짜 데이터 (20명)
+  const socialProofData = [
+    { name: '김민수', location: '서울 강남구', time: '방금 전' },
+    { name: '이지은', location: '부산 해운대구', time: '1분 전' },
+    { name: '박철수', location: '대구 수성구', time: '2분 전' },
+    { name: '최영희', location: '인천 남동구', time: '3분 전' },
+    { name: '정현우', location: '광주 서구', time: '5분 전' },
+    { name: '강수진', location: '대전 유성구', time: '7분 전' },
+    { name: '윤서연', location: '울산 남구', time: '10분 전' },
+    { name: '장동혁', location: '경기 성남시', time: '12분 전' },
+    { name: '한미영', location: '경기 용인시', time: '15분 전' },
+    { name: '오준호', location: '서울 송파구', time: '18분 전' },
+    { name: '신예린', location: '서울 마포구', time: '20분 전' },
+    { name: '임태훈', location: '경기 고양시', time: '25분 전' },
+    { name: '문지현', location: '인천 연수구', time: '30분 전' },
+    { name: '배성민', location: '부산 동래구', time: '35분 전' },
+    { name: '조은서', location: '대구 달서구', time: '40분 전' },
+    { name: '류현진', location: '경기 수원시', time: '45분 전' },
+    { name: '권나연', location: '서울 강서구', time: '50분 전' },
+    { name: '송지훈', location: '광주 북구', time: '55분 전' },
+    { name: '황민지', location: '대전 서구', time: '1시간 전' },
+    { name: '안재원', location: '울산 중구', time: '1시간 전' }
+  ];
 
   // 페이지 로드 시 스크롤을 맨 위로 + 설정 불러오기
   useEffect(() => {
@@ -22,6 +48,31 @@ function HomePage() {
       }
     };
     fetchSettings();
+  }, []);
+
+  // Social Proof 알림 순환
+  useEffect(() => {
+    // 3초 후 첫 알림 시작
+    const startTimer = setTimeout(() => {
+      setShowNotification(true);
+    }, 3000);
+
+    // 알림 순환 인터벌
+    const interval = setInterval(() => {
+      setShowNotification(false);
+
+      setTimeout(() => {
+        setCurrentNotificationIndex(prev =>
+          (prev + 1) % socialProofData.length
+        );
+        setShowNotification(true);
+      }, 500); // 0.5초 후 다음 알림
+    }, 5000); // 5초마다 변경
+
+    return () => {
+      clearTimeout(startTimer);
+      clearInterval(interval);
+    };
   }, []);
 
   const faqs = [
@@ -554,6 +605,45 @@ function HomePage() {
           </p>
         </div>
       </section>
+
+      {/* Social Proof 알림 */}
+      <div
+        className={`fixed bottom-4 left-4 z-50 transition-all duration-500 ${
+          showNotification
+            ? 'opacity-100 translate-x-0'
+            : 'opacity-0 -translate-x-full'
+        }`}
+      >
+        <div className="bg-white rounded-lg shadow-2xl border-l-4 border-green-500 p-4 max-w-xs">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0">
+              <span className="text-green-600 text-lg">✓</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold text-gray-900 truncate">
+                {socialProofData[currentNotificationIndex]?.name}님이 신청했습니다
+              </p>
+              <p className="text-xs text-gray-500">
+                {socialProofData[currentNotificationIndex]?.location} · {socialProofData[currentNotificationIndex]?.time}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Social Proof 애니메이션 CSS */}
+      <style>{`
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-100%);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
     </div>
   );
 }
