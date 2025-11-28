@@ -2,6 +2,11 @@ import { Link } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+// 이미지 import
+import dirtyImage1 from '../../public/images/1.jpg';
+import dirtyImage2 from '../../public/images/2.jpg';
+import dirtyImage3 from '../../public/images/3.jpg';
+
 function HomePage() {
   const [openFaq, setOpenFaq] = useState(null);
   const [customPrefix, setCustomPrefix] = useState('');
@@ -657,16 +662,12 @@ function HomePage() {
 
             {/* 사진들 */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              {['1.jpg', '2.jpg', '3.jpg'].map((filename, idx) => (
-                <div key={filename} className="bg-white rounded-lg overflow-hidden shadow-2xl">
+              {[dirtyImage1, dirtyImage2, dirtyImage3].map((imageSrc, idx) => (
+                <div key={idx} className="bg-white rounded-lg overflow-hidden shadow-2xl">
                   <img
-                    src={`/images/${filename}`}
+                    src={imageSrc}
                     alt={`오염된 매트리스 ${idx + 1}`}
                     className="w-full h-64 object-cover"
-                    onError={(e) => {
-                      console.error(`이미지 로드 실패: /images/${filename}`);
-                      e.target.src = '/vite.svg'; // 폴백 이미지
-                    }}
                   />
                   <div className="p-3 bg-red-600 text-white text-center font-bold">
                     😱 케어 전 실제 모습
