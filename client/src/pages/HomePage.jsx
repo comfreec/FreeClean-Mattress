@@ -376,7 +376,7 @@ function HomePage() {
                 </div>
 
                 <div className="bg-red-500 text-white text-center py-2 rounded-lg mb-4 font-bold text-lg">
-                  ❌ 케어 전 (사진 보기)
+                  ❌ 케어 전
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3 text-red-200">
