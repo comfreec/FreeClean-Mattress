@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
@@ -8,6 +8,7 @@ import dirtyImage2 from '../assets/images/2.jpg';
 import dirtyImage3 from '../assets/images/3.jpg';
 
 function HomePage() {
+  const navigate = useNavigate();
   const [openFaq, setOpenFaq] = useState(null);
   const [customPrefix, setCustomPrefix] = useState('');
   const [showNotification, setShowNotification] = useState(false);
@@ -120,6 +121,37 @@ function HomePage() {
       clearInterval(interval);
     };
   }, []);
+
+  // 사진 모달 관리 및 뒤로가기 처리
+  useEffect(() => {
+    const handlePopState = (e) => {
+      setShowDirtyPhotos(false);
+      setCurrentPhotoIndex(0);
+      setIsZoomed(true);
+      navigate('/application');
+    };
+
+    if (showDirtyPhotos) {
+      // 모달이 열릴 때 history에 state 추가
+      window.history.pushState({ modal: 'photos' }, '');
+      window.addEventListener('popstate', handlePopState);
+
+      return () => {
+        window.removeEventListener('popstate', handlePopState);
+      };
+    }
+  }, [showDirtyPhotos, navigate]);
+
+  // 모달 닫기 함수
+  const closeModal = () => {
+    setShowDirtyPhotos(false);
+    setCurrentPhotoIndex(0);
+    setIsZoomed(true);
+    // history.back()으로 pushState 제거
+    if (window.history.state?.modal === 'photos') {
+      window.history.back();
+    }
+  };
 
   const faqs = [
     {
@@ -684,20 +716,12 @@ function HomePage() {
       {showDirtyPhotos && (
         <div
           className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-3 md:p-4"
-          onClick={() => {
-            setShowDirtyPhotos(false);
-            setCurrentPhotoIndex(0);
-            setIsZoomed(true);
-          }}
+          onClick={closeModal}
         >
           <div className="relative max-w-4xl w-full" onClick={(e) => e.stopPropagation()}>
             {/* 닫기 버튼 */}
             <button
-              onClick={() => {
-                setShowDirtyPhotos(false);
-                setCurrentPhotoIndex(0);
-                setIsZoomed(true);
-              }}
+              onClick={closeModal}
               className="absolute -top-10 md:-top-12 right-0 text-white text-3xl md:text-4xl font-bold hover:text-red-500 transition z-10"
             >
               ✕
@@ -772,11 +796,7 @@ function HomePage() {
             <div className="mt-3 md:mt-4 text-center px-2">
               <Link
                 to="/application"
-                onClick={() => {
-                  setShowDirtyPhotos(false);
-                  setCurrentPhotoIndex(0);
-                  setIsZoomed(true);
-                }}
+                onClick={closeModal}
                 className="inline-block bg-gradient-to-r from-yellow-400 to-yellow-300 text-gray-900 px-6 md:px-8 py-3 md:py-4 rounded-full text-base md:text-xl font-black hover:scale-105 transition-transform shadow-2xl w-full md:w-auto"
               >
                 🎁 지금 무료로 케어 신청하기
