@@ -350,7 +350,7 @@ function HomePage() {
                 className="bg-red-900/30 border-4 border-red-500 rounded-2xl p-6 md:p-8 cursor-pointer hover:scale-105 transition-transform"
               >
                 <div className="bg-red-500 text-white text-center py-2 rounded-lg mb-4 font-bold text-lg">
-                  ❌ 케어 전 (클릭하여 실제 사진 보기)
+                  ❌ 케어 전 (사진 보기)
                 </div>
                 <div className="space-y-3">
                   <div className="flex items-start gap-3 text-red-200">
