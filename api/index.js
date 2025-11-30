@@ -219,15 +219,18 @@ export default async function handler(req, res) {
 
       await db.collection('applications').doc(id).update(updateData);
 
-      // 가망 체크되고 완료 처리되면 prospects 컬렉션에 복사
-      if (status === 'completed' && isProspect === true) {
+      // 완료 처리 시 가망고객 여부 확인하여 prospects 컬렉션에 복사
+      if (status === 'completed') {
         const docSnapshot = await db.collection('applications').doc(id).get();
         if (docSnapshot.exists) {
           const data = docSnapshot.data();
-          await db.collection('prospects').doc(id).set({
-            ...data,
-            prospect_added_at: admin.firestore.FieldValue.serverTimestamp()
-          });
+          // DB에 저장된 isProspect 값 확인
+          if (data.isProspect === true) {
+            await db.collection('prospects').doc(id).set({
+              ...data,
+              prospect_added_at: admin.firestore.FieldValue.serverTimestamp()
+            });
+          }
         }
       }
 
