@@ -24,6 +24,8 @@ function AdminPage() {
   const [filter, setFilter] = useState('all');
   const [activeTab, setActiveTab] = useState('applications'); // 'applications' or 'posts'
   const [viewArchived, setViewArchived] = useState(false); // 보관함 보기
+  const [viewProspects, setViewProspects] = useState(false); // 가망고객 보기
+  const [prospects, setProspects] = useState([]); // 가망고객 목록
   const [loading, setLoading] = useState(true);
   const [activeSessions, setActiveSessions] = useState([]); // 접속 중인 관리자
   const [showStats, setShowStats] = useState(false); // 통계 모달
@@ -399,9 +401,30 @@ function AdminPage() {
     }
   };
 
+  const fetchProspects = async () => {
+    setLoading(true);
+    try {
+      const response = await api.get('/api/prospects');
+      if (response.data.success) {
+        setProspects(response.data.prospects);
+      }
+    } catch (error) {
+      console.error('가망고객 로딩 실패:', error);
+      alert('가망고객 데이터를 불러오는 중 오류가 발생했습니다.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const fetchData = async () => {
     setLoading(true);
     try {
+      // 가망고객 보기 모드
+      if (viewProspects) {
+        fetchProspects();
+        return;
+      }
+
       // 보관함 보기 모드라면 보관된 데이터 가져오기
       if (viewArchived) {
         fetchArchivedData();
@@ -431,7 +454,7 @@ function AdminPage() {
     }
   };
 
-  const updateStatus = async (id, newStatus) => {
+  const updateStatus = async (id, newStatus, isProspect = null) => {
     try {
       // 취소를 선택하면 대기중으로 변경하고 약속 날짜/시간도 제거
       const updateData = {};
@@ -442,6 +465,11 @@ function AdminPage() {
         updateData.preferred_time = '';
       } else {
         updateData.status = newStatus;
+      }
+
+      // 가망 체크박스 값이 전달된 경우 포함
+      if (isProspect !== null) {
+        updateData.isProspect = isProspect;
       }
 
       const response = await api.patch(`/api/applications/${id}`, updateData);
@@ -948,9 +976,37 @@ function AdminPage() {
               >
                 {viewArchived ? '🔙 일반보기' : '📋 완료처리건보기'}
               </button>
+              <button
+                onClick={() => {
+                  const newViewProspects = !viewProspects;
+                  setViewProspects(newViewProspects);
+                  setViewArchived(false);
+                  setFilter('all');
+                  // 가망고객 보기를 켜면 가망고객 데이터 가져오기, 끄면 일반 데이터 가져오기
+                  setTimeout(() => {
+                    if (newViewProspects) {
+                      fetchProspects();
+                    } else {
+                      fetchData();
+                    }
+                  }, 0);
+                }}
+                className={`px-4 py-2 rounded-lg font-semibold transition ${
+                  viewProspects
+                    ? 'bg-purple-600 text-white hover:bg-purple-700'
+                    : 'bg-gray-600 text-white hover:bg-gray-700'
+                }`}
+              >
+                {viewProspects ? '🔙 일반보기' : '⭐ 가망고객보기'}
+              </button>
               {viewArchived && (
                 <span className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm font-semibold">
                   보관함 보기 중
+                </span>
+              )}
+              {viewProspects && (
+                <span className="bg-purple-100 text-purple-800 px-3 py-1 rounded-full text-sm font-semibold">
+                  가망고객 보기 중
                 </span>
               )}
             </div>
@@ -974,7 +1030,7 @@ function AdminPage() {
 
           {/* 모바일 카드 뷰 */}
           <div className="block md:hidden p-3 space-y-3">
-            {applications.map((app) => (
+            {(viewProspects ? prospects : applications).map((app) => (
               <div
                 key={app.id}
                 className={`border-2 rounded-lg p-4 relative shadow-sm ${
@@ -1049,6 +1105,21 @@ function AdminPage() {
                   </div>
                 )}
 
+                {/* 가망 체크박스 */}
+                {!viewArchived && (
+                  <div className="mt-3 bg-purple-50 p-3 rounded-lg border border-purple-200">
+                    <label className="flex items-center gap-2 cursor-pointer">
+                      <input
+                        type="checkbox"
+                        id={`prospect-${app.id}`}
+                        defaultChecked={app.isProspect || false}
+                        className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
+                      />
+                      <span className="text-sm font-semibold text-purple-800">⭐ 가망고객</span>
+                    </label>
+                  </div>
+                )}
+
                 <div className="mt-4 space-y-3">
                   {/* 약속 날짜/시간 입력 (일반 보기만) */}
                   {!viewArchived && (
@@ -1104,7 +1175,11 @@ function AdminPage() {
                       <label className="block text-sm font-semibold text-gray-700 mb-1">상태 변경</label>
                       <select
                         value={app.status}
-                        onChange={(e) => updateStatus(app.id, e.target.value)}
+                        onChange={(e) => {
+                          const newStatus = e.target.value;
+                          const isProspect = document.getElementById(`prospect-${app.id}`)?.checked;
+                          updateStatus(app.id, newStatus, isProspect);
+                        }}
                         className="w-full border-2 border-coway-blue rounded-lg px-4 py-3 text-base font-semibold bg-white focus:outline-none focus:ring-2 focus:ring-coway-blue"
                       >
                         <option value="pending">대기중</option>
@@ -1204,7 +1279,7 @@ function AdminPage() {
                 </tr>
               </thead>
               <tbody className="bg-white divide-y-2 divide-gray-800">
-                {applications.map((app) => (
+                {(viewProspects ? prospects : applications).map((app) => (
                   <tr
                     key={app.id}
                     className={`relative ${
@@ -1249,6 +1324,20 @@ function AdminPage() {
                               }
                             }}
                           />
+                        </div>
+                      )}
+                      {/* 가망 체크박스 (데스크톱) */}
+                      {!viewArchived && (
+                        <div className="mt-1">
+                          <label className="flex items-center gap-1 cursor-pointer text-xs">
+                            <input
+                              type="checkbox"
+                              id={`desk-prospect-${app.id}`}
+                              defaultChecked={app.isProspect || false}
+                              className="w-3 h-3 text-purple-600 rounded focus:ring-purple-500"
+                            />
+                            <span className="text-purple-700 font-semibold">⭐ 가망</span>
+                          </label>
                         </div>
                       )}
                     </td>
@@ -1323,7 +1412,11 @@ function AdminPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           <select
                             value={app.status}
-                            onChange={(e) => updateStatus(app.id, e.target.value)}
+                            onChange={(e) => {
+                              const newStatus = e.target.value;
+                              const isProspect = document.getElementById(`desk-prospect-${app.id}`)?.checked;
+                              updateStatus(app.id, newStatus, isProspect);
+                            }}
                             className="border border-gray-300 rounded px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-coway-blue"
                           >
                             <option value="pending">대기중</option>
@@ -1334,7 +1427,10 @@ function AdminPage() {
                         <td className="px-6 py-4 whitespace-nowrap text-sm">
                           {app.status !== 'completed' ? (
                             <button
-                              onClick={() => updateStatus(app.id, 'completed')}
+                              onClick={() => {
+                                const isProspect = document.getElementById(`desk-prospect-${app.id}`)?.checked;
+                                updateStatus(app.id, 'completed', isProspect);
+                              }}
                               className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 transition font-semibold"
                             >
                               ✓ 완료 처리

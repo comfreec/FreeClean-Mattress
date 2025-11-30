@@ -208,15 +208,28 @@ export default async function handler(req, res) {
     // 3. 신청 상태 업데이트
     if (path.startsWith('/applications/') && method === 'PATCH') {
       const id = path.split('/')[2];
-      const { status, preferred_date, preferred_time, memo } = req.body;
+      const { status, preferred_date, preferred_time, memo, isProspect } = req.body;
 
       const updateData = {};
       if (status !== undefined) updateData.status = status;
       if (preferred_date !== undefined) updateData.preferred_date = preferred_date;
       if (preferred_time !== undefined) updateData.preferred_time = preferred_time;
       if (memo !== undefined) updateData.memo = memo;
+      if (isProspect !== undefined) updateData.isProspect = isProspect;
 
       await db.collection('applications').doc(id).update(updateData);
+
+      // 가망 체크되고 완료 처리되면 prospects 컬렉션에 복사
+      if (status === 'completed' && isProspect === true) {
+        const docSnapshot = await db.collection('applications').doc(id).get();
+        if (docSnapshot.exists) {
+          const data = docSnapshot.data();
+          await db.collection('prospects').doc(id).set({
+            ...data,
+            prospect_added_at: admin.firestore.FieldValue.serverTimestamp()
+          });
+        }
+      }
 
       return res.json({
         success: true,
@@ -548,6 +561,21 @@ export default async function handler(req, res) {
         success: true,
         message: '게시글이 삭제되었습니다.'
       });
+    }
+
+    // 12-1. 가망고객 목록 조회
+    if (path === '/prospects' && method === 'GET') {
+      const snapshot = await db.collection('prospects').get();
+      const prospects = snapshot.docs.map(doc => ({
+        id: doc.id,
+        ...doc.data(),
+        created_at: doc.data().created_at?.toDate().toISOString(),
+        prospect_added_at: doc.data().prospect_added_at?.toDate().toISOString()
+      }))
+      // 가망고객 추가 날짜 기준 최신순
+      .sort((a, b) => new Date(b.prospect_added_at) - new Date(a.prospect_added_at));
+
+      return res.json({ success: true, prospects });
     }
 
     // 13. 설정 조회
