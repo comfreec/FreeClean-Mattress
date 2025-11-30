@@ -16,6 +16,7 @@ function HomePage() {
   const [showDirtyPhotos, setShowDirtyPhotos] = useState(false);
   const [currentPhotoIndex, setCurrentPhotoIndex] = useState(0);
   const [isZoomed, setIsZoomed] = useState(true);
+  const [showYouTubeVideo, setShowYouTubeVideo] = useState(false);
 
   const dirtyImages = [dirtyImage1, dirtyImage2, dirtyImage3];
 
@@ -275,14 +276,12 @@ function HomePage() {
               ⭐ 고객 후기 보기 (만족도 4.9/5)
             </Link>
 
-            <a
-              href="https://m.youtube.com/watch?v=terNhLRFTwI&pp=0gcJCR4Bo7VqN5tD4gcMEgpwZXJwbGV4aXR5"
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => setShowYouTubeVideo(true)}
               className="w-full sm:w-auto inline-flex items-center justify-center bg-gradient-to-r from-purple-600 to-pink-600 text-white px-6 sm:px-8 py-3 md:py-4 rounded-full text-sm md:text-base font-bold hover:scale-105 transition-all shadow-xl whitespace-nowrap border-2 border-purple-400"
             >
               📹 진드기 위험성 영상 보기
-            </a>
+            </button>
           </div>
 
           <div className="flex flex-wrap justify-center gap-4 md:gap-8 text-xs md:text-sm px-4">
@@ -827,6 +826,41 @@ function HomePage() {
               >
                 🎁 지금 무료로 케어 신청하기
               </Link>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* YouTube 영상 모달 */}
+      {showYouTubeVideo && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-95 z-50 flex items-center justify-center p-2 md:p-4"
+          onClick={() => setShowYouTubeVideo(false)}
+        >
+          <div className="relative w-full h-full max-w-7xl max-h-screen flex flex-col" onClick={(e) => e.stopPropagation()}>
+            {/* 닫기 버튼 */}
+            <button
+              onClick={() => setShowYouTubeVideo(false)}
+              className="absolute -top-2 md:-top-12 right-0 text-white text-3xl md:text-4xl font-bold hover:text-red-500 transition z-10"
+            >
+              ✕
+            </button>
+
+            {/* 제목 */}
+            <h2 className="text-white text-lg md:text-3xl font-bold text-center mb-3 md:mb-4 px-2 pt-8 md:pt-0">
+              📹 진드기 위험성 영상
+            </h2>
+
+            {/* YouTube iframe - 거의 전체 화면 */}
+            <div className="flex-1 relative bg-black rounded-lg overflow-hidden">
+              <iframe
+                className="absolute top-0 left-0 w-full h-full"
+                src="https://www.youtube.com/embed/terNhLRFTwI?autoplay=1&rel=0"
+                title="진드기 위험성 영상"
+                frameBorder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+                allowFullScreen
+              ></iframe>
             </div>
           </div>
         </div>
