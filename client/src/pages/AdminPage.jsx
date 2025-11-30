@@ -454,6 +454,27 @@ function AdminPage() {
     }
   };
 
+  // 가망고객 체크박스 전용 업데이트 (깜빡임 없이)
+  const updateProspectStatus = async (id, isProspect) => {
+    // 낙관적 업데이트: 먼저 로컬 state 업데이트
+    const previousApplications = [...applications];
+    setApplications(prevApps =>
+      prevApps.map(app =>
+        app.id === id ? { ...app, isProspect } : app
+      )
+    );
+
+    try {
+      // 백그라운드에서 API 호출
+      await api.patch(`/api/applications/${id}`, { isProspect });
+    } catch (error) {
+      console.error('가망고객 업데이트 실패:', error);
+      // 실패 시 이전 상태로 복구
+      setApplications(previousApplications);
+      alert('가망고객 업데이트 중 오류가 발생했습니다.');
+    }
+  };
+
   const updateStatus = async (id, newStatus, isProspect = null) => {
     try {
       // 취소를 선택하면 대기중으로 변경하고 약속 날짜/시간도 제거
@@ -1142,9 +1163,9 @@ function AdminPage() {
                       <input
                         type="checkbox"
                         id={`prospect-${app.id}`}
-                        defaultChecked={app.isProspect || false}
+                        checked={app.isProspect || false}
                         onChange={(e) => {
-                          updateStatus(app.id, app.status, e.target.checked);
+                          updateProspectStatus(app.id, e.target.checked);
                         }}
                         className="w-4 h-4 text-purple-600 rounded focus:ring-purple-500"
                       />
@@ -1377,9 +1398,9 @@ function AdminPage() {
                             <input
                               type="checkbox"
                               id={`desk-prospect-${app.id}`}
-                              defaultChecked={app.isProspect || false}
+                              checked={app.isProspect || false}
                               onChange={(e) => {
-                                updateStatus(app.id, app.status, e.target.checked);
+                                updateProspectStatus(app.id, e.target.checked);
                               }}
                               className="w-3 h-3 text-purple-600 rounded focus:ring-purple-500"
                             />
