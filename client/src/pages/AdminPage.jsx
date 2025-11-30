@@ -1018,10 +1018,12 @@ function AdminPage() {
           {/* 헤더 */}
           <div className="px-6 py-4 bg-gradient-to-r from-gray-50 to-blue-50 border-b">
             <h2 className="text-xl font-bold text-gray-900">
-              {viewArchived ? '📦 보관된 항목' : '📋 신청 내역'}
+              {viewProspects ? '⭐ 가망고객' : viewArchived ? '📦 보관된 항목' : '📋 신청 내역'}
             </h2>
             <p className="text-sm text-gray-600 mt-1">
-              {viewArchived
+              {viewProspects
+                ? `총 ${prospects.length}명의 가망고객`
+                : viewArchived
                 ? `총 ${applications.length}개의 보관된 항목`
                 : `총 ${applications.length}개의 신청`
               }
@@ -1030,7 +1032,17 @@ function AdminPage() {
 
           {/* 모바일 카드 뷰 */}
           <div className="block md:hidden p-3 space-y-3">
-            {(viewProspects ? prospects : applications).map((app) => (
+            {(viewProspects ? prospects : applications).length === 0 ? (
+              <div className="text-center py-12 text-gray-500">
+                <p className="text-lg font-semibold mb-2">
+                  {viewProspects ? '⭐ 등록된 가망고객이 없습니다' : viewArchived ? '📦 보관된 항목이 없습니다' : '📋 신청 내역이 없습니다'}
+                </p>
+                <p className="text-sm">
+                  {viewProspects ? '가망 체크하고 완료 처리하면 여기에 표시됩니다' : ''}
+                </p>
+              </div>
+            ) : (
+              (viewProspects ? prospects : applications).map((app) => (
               <div
                 key={app.id}
                 className={`border-2 rounded-lg p-4 relative shadow-sm ${
@@ -1224,7 +1236,7 @@ function AdminPage() {
                   )}
                 </div>
               </div>
-            ))}
+            )))}
           </div>
 
           {/* 데스크톱 테이블 뷰 */}
@@ -1477,9 +1489,14 @@ function AdminPage() {
               </tbody>
             </table>
 
-            {applications.length === 0 && (
+            {(viewProspects ? prospects : applications).length === 0 && (
               <div className="text-center py-12 text-gray-500">
-                신청 내역이 없습니다
+                <p className="text-lg font-semibold mb-2">
+                  {viewProspects ? '⭐ 등록된 가망고객이 없습니다' : viewArchived ? '📦 보관된 항목이 없습니다' : '📋 신청 내역이 없습니다'}
+                </p>
+                <p className="text-sm">
+                  {viewProspects ? '가망 체크하고 완료 처리하면 여기에 표시됩니다' : ''}
+                </p>
               </div>
             )}
           </div>
