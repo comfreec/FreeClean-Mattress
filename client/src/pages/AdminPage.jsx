@@ -1099,7 +1099,7 @@ function AdminPage() {
                   <div>
                     <div className="flex items-center gap-2 flex-wrap">
                       <div className="font-bold text-lg text-gray-900">{app.name}</div>
-                      {app.preferred_date && app.preferred_time && !viewArchived && (
+                      {app.preferred_date && app.preferred_time && !viewArchived && !viewProspects && (
                         <span className="bg-green-500 text-white text-xs px-2 py-1 rounded-full font-bold">
                           ✓ 컨택완료
                         </span>
@@ -1118,7 +1118,7 @@ function AdminPage() {
                       )}
                     </div>
                   </div>
-                  {getStatusBadge(app.status)}
+                  {!viewProspects && getStatusBadge(app.status)}
                 </div>
 
                 <div className="space-y-2 text-sm">
@@ -1157,7 +1157,7 @@ function AdminPage() {
                 )}
 
                 {/* 가망 체크박스 */}
-                {!viewArchived && (
+                {!viewArchived && !viewProspects && (
                   <div className="mt-3 bg-purple-50 p-3 rounded-lg border border-purple-200">
                     <label className="flex items-center gap-2 cursor-pointer">
                       <input
@@ -1364,7 +1364,7 @@ function AdminPage() {
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <div className="flex items-center gap-2 flex-wrap">
                         <span>{app.name}</span>
-                        {app.preferred_date && app.preferred_time && !viewArchived && (
+                        {app.preferred_date && app.preferred_time && !viewArchived && !viewProspects && (
                           <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full font-bold whitespace-nowrap">
                             ✓ 컨택완료
                           </span>
@@ -1392,7 +1392,7 @@ function AdminPage() {
                         </div>
                       )}
                       {/* 가망 체크박스 (데스크톱) */}
-                      {!viewArchived && (
+                      {!viewArchived && !viewProspects && (
                         <div className="mt-1">
                           <label className="flex items-center gap-1 cursor-pointer text-xs">
                             <input
@@ -1509,7 +1509,7 @@ function AdminPage() {
                         </td>
                       </>
                     )}
-                    {(viewArchived || viewProspects) && (
+                    {viewArchived && (
                       <td className="px-6 py-4 whitespace-nowrap">
                         {getStatusBadge(app.status)}
                       </td>
